@@ -21,13 +21,19 @@ public class LineModel {
         return lines;
     }
 
-    public void addLine(double x, double y) {
-        //lines.add(new DLine(x, y));
-        notifySubscribers();
+    public DLine addLine(double x1, double y1, double x2, double y2) {
+        DLine line = new DLine(x1, y1, x2, y2);
+        lines.add(line);
+        return line;
     }
 
     public void removeLine(DLine line) {
         lines.remove(line);
+        notifySubscribers();
+    }
+
+    public void adjustLine(DLine line, double x2, double y2) {
+        line.adjust(x2, y2);
         notifySubscribers();
     }
 
@@ -43,12 +49,12 @@ public class LineModel {
      * @param y: y position to check
      * @return: the first entity found with the coords
      */
-//    public DLine whichEntity(double x, double y) {
-//        return lines.stream()
-//                .filter(e -> e.contains(x, y))
-//                .findFirst()
-//                .orElse(null);
-//    }
+    public DLine whichEntity(double x, double y) {
+        return lines.stream()
+                .filter(e -> e.contains(x, y))
+                .findFirst()
+                .orElse(null);
+    }
 
 
     /**

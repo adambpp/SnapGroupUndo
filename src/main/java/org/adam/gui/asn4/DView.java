@@ -8,13 +8,14 @@ public class DView extends StackPane implements Subscriber{
 
     private double width, height;
     private GraphicsContext gc;
+    private Canvas myCanvas;
     private LineModel model;
     private iModel iModel;
 
     public DView(){
         width = 800;
         height = 800;
-        Canvas myCanvas = new Canvas(width, height);
+        myCanvas = new Canvas(width, height);
         gc = myCanvas.getGraphicsContext2D();
 
         this.getChildren().add(myCanvas);
@@ -38,7 +39,10 @@ public class DView extends StackPane implements Subscriber{
 
 
     private void draw() {
-
+        gc.clearRect(0, 0, myCanvas.getWidth(), myCanvas.getHeight());
+        for (DLine dl : model.getLines() ) {
+            gc.strokeLine(dl.getX1(), dl.getY1(), dl.getX2(), dl.getY2());
+        }
     }
 
     @Override

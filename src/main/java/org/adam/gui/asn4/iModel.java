@@ -31,6 +31,13 @@ public class iModel {
     }
 
     /**
+     * Clear the currently selected line by setting selected to null
+     */
+    public void clearSelection() {
+        selected = null;
+    }
+
+    /**
      * Adds a subscriber to the publishing/subscribe pattern
      * @param s: subscriber to add
      */

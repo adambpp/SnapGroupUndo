@@ -35,6 +35,7 @@ public class iModel {
      */
     public void clearSelection() {
         selected = null;
+        notifySubscribers();
     }
 
     /**

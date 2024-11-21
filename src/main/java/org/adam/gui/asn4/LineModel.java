@@ -37,9 +37,22 @@ public class LineModel {
         notifySubscribers();
     }
 
-    // TODO: implement contains in a way that works for a line (look in the course slides)
-    public boolean contains(double x, double y) {
-        return true;
+    public void moveLine(DLine line, double nX, double nY) {
+        line.move(nX, nY);
+        notifySubscribers();
+    }
+
+    /**
+     * Checks to see any lines in the model are within bounds of an x and y and threshold
+     *
+     * @param x: x bounds
+     * @param y: y bounds
+     * @param threshold: distance between line and click that is valid
+     * @return: true if any lines are within bounds, false otherwise
+     */
+
+    public boolean contains(double x, double y, double threshold) {
+        return lines.stream().anyMatch(e -> e.contains(x, y, threshold));
     }
 
     /**
@@ -47,11 +60,12 @@ public class LineModel {
      *
      * @param x: x position to check
      * @param y: y position to check
+     * @param threshold: distance between line and click that is valid
      * @return: the first entity found with the coords
      */
-    public DLine whichEntity(double x, double y) {
+    public DLine whichEntity(double x, double y, double threshold) {
         return lines.stream()
-                .filter(e -> e.contains(x, y))
+                .filter(e -> e.contains(x, y, threshold))
                 .findFirst()
                 .orElse(null);
     }

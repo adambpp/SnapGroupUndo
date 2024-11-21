@@ -7,6 +7,7 @@ public class AppController {
     private LineModel model;
     private iModel iModel;
     private ControllerState currentState;
+    private double prevX, prevY, dX, dY;
 
     public AppController() {
         currentState = ready;
@@ -56,9 +57,36 @@ public class AppController {
         @Override
         void handlePressed(MouseEvent e) {
             System.out.println("mouse pressed in ready state");
-            DLine line = model.addLine(e.getX(),e.getY(),e.getX(),e.getY());
+            if (model.contains(e.getX(), e.getY(), 5)) {
+                System.out.println("Mouse click within bounds of line");
+                iModel.setSelected(model.whichEntity(e.getX(), e.getY(), 5));
+                currentState = moving;
+                prevX = e.getX();
+                prevY = e.getY();
+
+            } else {
+                currentState = createOrDeselect;
+            }
+        }
+    };
+
+    /**
+     *  This is an intermediary state. If a drag is detected after the initial press, we go to creating, otherwise
+     *  we clear selection and go back to ready state
+     */
+    ControllerState createOrDeselect = new ControllerState() {
+        @Override
+        void handleDragged(MouseEvent e) {
+            DLine line = model.addLine(e.getX(), e.getY(), e.getX(), e.getY());
             iModel.setSelected(line);
             currentState = creating;
+        }
+
+        @Override
+        void handleReleased(MouseEvent e) {
+            System.out.println("mouse released createOrDeselect, deselecting and going back to ready");
+            iModel.clearSelection();
+            currentState = ready;
         }
     };
 
@@ -76,7 +104,27 @@ public class AppController {
         @Override
         void handleReleased(MouseEvent e) {
             System.out.println("mouse released in creating state, going back to ready");
-            iModel.clearSelection();
+            currentState = ready;
+        }
+    };
+
+    /**
+     * Moving state. If a line is selected then the user can move that line around until the mouse click is released.
+     */
+    ControllerState moving = new ControllerState() {
+        @Override
+        void handleDragged(MouseEvent e) {
+            System.out.println("moving selected line");
+            dX = e.getX() - prevX;
+            dY = e.getY() - prevY;
+            prevX = e.getX();
+            prevY = e.getY();
+
+            model.moveLine(iModel.getSelected(),dX,dY);
+        }
+
+        @Override
+        void handleReleased(MouseEvent e) {
             currentState = ready;
         }
     };

@@ -21,6 +21,7 @@ public class DView extends StackPane implements Subscriber{
         gc = myCanvas.getGraphicsContext2D();
 
         Platform.runLater(this::draw);
+        Platform.runLater(myCanvas::requestFocus);
 
         this.getChildren().add(myCanvas);
     }

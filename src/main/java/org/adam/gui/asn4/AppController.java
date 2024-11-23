@@ -1,7 +1,10 @@
 package org.adam.gui.asn4;
 
+import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyEvent;
 import javafx.scene.input.MouseEvent;
+
+import java.util.Objects;
 
 public class AppController {
     private LineModel model;
@@ -64,7 +67,13 @@ public class AppController {
                 prevX = e.getX();
                 prevY = e.getY();
 
-            } else {
+            }
+        }
+
+        @Override
+        void handleKeyPressed(KeyEvent e) {
+            if (e.isShiftDown()) {
+                System.out.println("shift key pressed, about to create new line");
                 currentState = createOrDeselect;
             }
         }

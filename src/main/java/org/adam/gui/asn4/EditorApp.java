@@ -15,6 +15,7 @@ public class EditorApp extends Application {
         Scene scene = new Scene(root);
         stage.setTitle("381 A4 2024");
         stage.setScene(scene);
+        stage.setResizable(false);
         stage.show();
     }
 

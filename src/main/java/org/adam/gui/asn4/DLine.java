@@ -1,13 +1,17 @@
 package org.adam.gui.asn4;
 
 public class DLine {
-    private double x1, y1, x2, y2;
+    private double x1, y1, x2, y2, scale;
+    private Endpoint endpoint1, endpoint2;
+    public enum Endpoints {ENDPOINT_1, ENDPOINT_2}
+    private Endpoints curEndpoint;
 
     public DLine(double x1, double y1, double x2, double y2) {
         this.x1 = x1;
         this.y1 = y1;
         this.x2 = x2;
         this.y2 = y2;
+        this.scale = 1.0;
     }
 
     public boolean contains(double x, double y, double threshold) {
@@ -26,6 +30,16 @@ public class DLine {
     public void adjust(double x2, double y2) {
         this.x2 = x2;
         this.y2 = y2;
+    }
+
+    public void adjustEndpoint(Endpoints endpoint, double nX, double nY) {
+        if (endpoint == Endpoints.ENDPOINT_1) {
+            this.x1 = nX;
+            this.y1 = nY;
+        } else if (endpoint == Endpoints.ENDPOINT_2) {
+            this.x2 = nX;
+            this.y2 = nY;
+        }
     }
 
     public void move(double nX, double nY) {
@@ -55,4 +69,50 @@ public class DLine {
     public double getY2() {
         return y2;
     }
+
+    public double getScale() {
+        return scale;
+    }
+
+    public Endpoint getEndpoint1() {
+        return endpoint1;
+    }
+    public Endpoint getEndpoint2() {
+        return endpoint2;
+    }
+
+    /*
+    ######################
+    SETTERS
+    ######################
+     */
+
+    public void setEndpoint1(double x, double y, int r) {
+        this.endpoint1 = new Endpoint(x, y, r);
+    }
+
+    public void setEndpoint2(double x, double y, int r) {
+        this.endpoint2 = new Endpoint(x, y, r);
+    }
+
+    public void setScale(double scale) {
+        this.scale = scale;
+    }
+
+    public void setCurEndpoint(Integer endpoint) {
+        if (endpoint == 0) {
+            curEndpoint = Endpoints.ENDPOINT_1;
+        } else {
+            curEndpoint = Endpoints.ENDPOINT_2;
+        }
+    }
+
+    public Endpoints getCurEndpoint() {
+        return curEndpoint;
+    }
+
+    public void clearEndpointSelection() {
+        curEndpoint = null;
+    }
+
 }

@@ -59,23 +59,51 @@ public class AppController {
     ControllerState ready = new ControllerState() {
         @Override
         void handlePressed(MouseEvent e) {
+            prevX = e.getX();
+            prevY = e.getY();
             System.out.println("mouse pressed in ready state");
             if (model.contains(e.getX(), e.getY(), 5)) {
-                System.out.println("Mouse click within bounds of line");
                 iModel.setSelected(model.whichEntity(e.getX(), e.getY(), 5));
-                currentState = moving;
-                prevX = e.getX();
-                prevY = e.getY();
+                DLine line = iModel.getSelected();
+                if (isWithinEndpoint(e.getX(), e.getY(), line.getX1(), line.getY1(), 5)) {
+                    System.out.println("Current endpoint set to endpoint 1");
+                    line.setCurEndpoint(0);
+                    currentState = endpointAdjusting;
+                } else if (isWithinEndpoint(e.getX(), e.getY(), line.getX2(), line.getY2(), 5)) {
+                    System.out.println("Current endpoint set to endpoint 2");
+                    line.setCurEndpoint(1);
+                    currentState = endpointAdjusting;
 
-            }
+                } else {
+                    currentState = moving;
+                }
+            } else {
+                iModel.clearSelection();
+                }
         }
 
         @Override
         void handleKeyPressed(KeyEvent e) {
-            if (e.isShiftDown()) {
+            if (Objects.requireNonNull(e.getCode()) == KeyCode.DELETE || e.getCode() == KeyCode.BACK_SPACE) {
+                System.out.println("delete or backspace was pressed, deleting line");
+                if (iModel.getSelected() != null) {
+                    model.removeLine(iModel.getSelected());
+                }
+            } else if (e.isShiftDown()) {
                 System.out.println("shift key pressed, about to create new line");
                 currentState = createOrDeselect;
             }
+        }
+
+        private boolean isWithinEndpoint(double mouseX, double mouseY, double endpX, double endpY, double r) {
+            double diffX = mouseX - endpX;
+            double diffY = mouseY - endpY;
+            double dist = Math.sqrt((diffX * diffX) + (diffY * diffY));
+            return dist <= r * 2;
+        }
+
+        private boolean notInHandleRange(DLine line, MouseEvent e) {
+            return isWithinEndpoint(e.getX(), e.getY(), line.getX1(), line.getY1(), 5) && isWithinEndpoint(e.getX(), e.getY(), line.getX2(), line.getY2(), 5);
         }
     };
 
@@ -83,7 +111,15 @@ public class AppController {
      *  This is an intermediary state. If a drag is detected after the initial press, we go to creating, otherwise
      *  we clear selection and go back to ready state
      */
+    //TODO: This should be changed to something like "SelectionBoxOrDeselect" (for part 2)
     ControllerState createOrDeselect = new ControllerState() {
+        @Override
+        void handleKeyReleased(KeyEvent e) {
+            if (Objects.requireNonNull(e.getCode()) == KeyCode.SHIFT) {
+                currentState = ready;
+            }
+        }
+
         @Override
         void handleDragged(MouseEvent e) {
             DLine line = model.addLine(e.getX(), e.getY(), e.getX(), e.getY());
@@ -134,6 +170,25 @@ public class AppController {
 
         @Override
         void handleReleased(MouseEvent e) {
+            currentState = ready;
+        }
+    };
+
+    ControllerState endpointAdjusting = new ControllerState() {
+        @Override
+        void handleDragged(MouseEvent e) {
+//            dX = e.getX() - prevX;
+//            dY = e.getY() - prevY;
+//            prevX = e.getX();
+//            prevY = e.getY();
+
+            DLine line = iModel.getSelected();
+            model.adjustEndpoint(line,e.getX(),e.getY());
+        }
+
+        @Override
+        void handleReleased(MouseEvent e) {
+            iModel.getSelected().clearEndpointSelection();
             currentState = ready;
         }
     };

@@ -37,6 +37,11 @@ public class LineModel {
         notifySubscribers();
     }
 
+    public void adjustEndpoint(DLine line, double nX, double nY) {
+        line.adjustEndpoint(line.getCurEndpoint(), nX, nY);
+        notifySubscribers();
+    }
+
     public void moveLine(DLine line, double nX, double nY) {
         line.move(nX, nY);
         notifySubscribers();

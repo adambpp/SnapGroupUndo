@@ -69,7 +69,7 @@ public class DView extends StackPane implements Subscriber{
             gc.strokeLine(i, 0, i, 800);
         }
         // y axis
-        for (int j = 0; j <= 1000; j+= 20) {
+        for (int j = 0; j <= 800; j+= 20) {
             gc.strokeLine(0, j, 1000, j);
         }
     }

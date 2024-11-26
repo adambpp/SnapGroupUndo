@@ -43,6 +43,11 @@ public class AppController {
         currentState.handleKeyReleased(e);
     }
 
+    private void snapToGrid(DLine line, double lineX, double lineY) {
+        double roundedX = Math.round(lineX / 20) * 20;
+        double roundedY = Math.round(lineY / 20) * 20;
+        model.adjustLine(line, roundedX, roundedY);
+    }
 
     private abstract class ControllerState {
         void handlePressed(MouseEvent e) {}
@@ -62,8 +67,12 @@ public class AppController {
             prevX = e.getX();
             prevY = e.getY();
             System.out.println("mouse pressed in ready state");
+
+            // first check if the mouse click is close enough to a line
             if (model.contains(e.getX(), e.getY(), 5)) {
                 iModel.setSelected(model.whichEntity(e.getX(), e.getY(), 5));
+
+                // check if we clicked on an endpoint before trying to move a line
                 DLine line = iModel.getSelected();
                 if (isWithinEndpoint(e.getX(), e.getY(), line.getX1(), line.getY1(), 5)) {
                     System.out.println("Current endpoint set to endpoint 1");
@@ -74,9 +83,11 @@ public class AppController {
                     line.setCurEndpoint(1);
                     currentState = endpointAdjusting;
 
+                // move the line if we were not on an endpoint
                 } else {
                     currentState = moving;
                 }
+            // clear selection otherwise
             } else {
                 iModel.clearSelection();
                 }
@@ -100,10 +111,6 @@ public class AppController {
             double diffY = mouseY - endpY;
             double dist = Math.sqrt((diffX * diffX) + (diffY * diffY));
             return dist <= r * 2;
-        }
-
-        private boolean notInHandleRange(DLine line, MouseEvent e) {
-            return isWithinEndpoint(e.getX(), e.getY(), line.getX1(), line.getY1(), 5) && isWithinEndpoint(e.getX(), e.getY(), line.getX2(), line.getY2(), 5);
         }
     };
 
@@ -148,7 +155,11 @@ public class AppController {
 
         @Override
         void handleReleased(MouseEvent e) {
+            DLine line = iModel.getSelected();
             System.out.println("mouse released in creating state, going back to ready");
+            double roundedX = Math.round(line.getX2() / 20) * 20;
+            double roundedY = Math.round(line.getY2() / 20) * 20;
+            model.adjustLine(line, roundedX, roundedY);
             currentState = ready;
         }
     };
@@ -177,17 +188,27 @@ public class AppController {
     ControllerState endpointAdjusting = new ControllerState() {
         @Override
         void handleDragged(MouseEvent e) {
-//            dX = e.getX() - prevX;
-//            dY = e.getY() - prevY;
-//            prevX = e.getX();
-//            prevY = e.getY();
-
+            System.out.println("adjusting endpoint");
             DLine line = iModel.getSelected();
             model.adjustEndpoint(line,e.getX(),e.getY());
         }
 
         @Override
         void handleReleased(MouseEvent e) {
+            System.out.println("mouse released, stopping endpoint adjustment");
+
+            // this code lowkey messy but whatever
+            DLine line = iModel.getSelected();
+            double roundedX;
+            double roundedY;
+            if (line.getCurEndpoint() == DLine.Endpoints.ENDPOINT_1) {
+                roundedX = Math.round(line.getX1() / 20) * 20;
+                roundedY = Math.round(line.getY1() / 20) * 20;
+            } else {
+                roundedX = Math.round(line.getX2() / 20) * 20;
+                roundedY = Math.round(line.getY2() / 20) * 20;
+            }
+            model.adjustEndpoint(line,roundedX,roundedY);
             iModel.getSelected().clearEndpointSelection();
             currentState = ready;
         }

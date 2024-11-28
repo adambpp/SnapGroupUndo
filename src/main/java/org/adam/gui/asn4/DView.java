@@ -3,6 +3,7 @@ package org.adam.gui.asn4;
 import javafx.application.Platform;
 import javafx.scene.canvas.Canvas;
 import javafx.scene.canvas.GraphicsContext;
+import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.StackPane;
 import javafx.scene.paint.Color;
 
@@ -41,6 +42,7 @@ public class DView extends StackPane implements Subscriber{
         setOnMouseReleased(controller::handleReleased);
         setOnKeyPressed(controller::handleKeyPressed);
         setOnKeyReleased(controller::handleKeyReleased);
+        setOnMouseMoved(controller::handleMouseMoved);
     }
 
     /**
@@ -51,9 +53,19 @@ public class DView extends StackPane implements Subscriber{
         gc.clearRect(0, 0, myCanvas.getWidth(), myCanvas.getHeight());
         drawGrid();
         for (DLine dl : model.getLines() ) {
+
+            // draw hover line
+            if (dl == imodel.getHovered()) {
+                gc.setLineWidth(10);
+                gc.setStroke(Color.rgb(211, 211, 211, 0.6));
+                gc.strokeLine(dl.getX1(), dl.getY1(), dl.getX2(), dl.getY2());
+            }
+
+            // draw normal line
             gc.setLineWidth(2);
             gc.setStroke(dl == imodel.getSelected() ? Color.PINK : Color.PURPLE);
             gc.strokeLine(dl.getX1(), dl.getY1(), dl.getX2(), dl.getY2());
+
             drawEndpoints(dl, dl.getX1(), dl.getY1(), dl.getX2(), dl.getY2());
         }
     }

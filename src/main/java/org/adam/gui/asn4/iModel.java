@@ -4,6 +4,7 @@ import java.util.ArrayList;
 
 public class iModel {
     private DLine selected;
+    private DLine hovered;
     private ArrayList<Subscriber> subs;
 
     public iModel() {
@@ -21,6 +22,11 @@ public class iModel {
         notifySubscribers();
     }
 
+    public void setHovered(DLine line) {
+        hovered = line;
+        notifySubscribers();
+    }
+
     /**
      * Gets the selected line so that the view and controller can perform operations on it
      *
@@ -30,11 +36,20 @@ public class iModel {
         return selected;
     }
 
+    public DLine getHovered() {
+        return hovered;
+    }
+
     /**
      * Clear the currently selected line by setting selected to null
      */
     public void clearSelection() {
         selected = null;
+        notifySubscribers();
+    }
+
+    public void clearHovered() {
+        hovered = null;
         notifySubscribers();
     }
 

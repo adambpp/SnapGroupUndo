@@ -43,6 +43,10 @@ public class AppController {
         currentState.handleKeyReleased(e);
     }
 
+    public void handleMouseMoved(MouseEvent e) {
+        currentState.handleMouseMoved(e);
+    }
+
     private void snapToGrid(DLine line, double lineX, double lineY) {
         double roundedX = Math.round(lineX / 20) * 20;
         double roundedY = Math.round(lineY / 20) * 20;
@@ -55,6 +59,7 @@ public class AppController {
         void handleReleased(MouseEvent e) {}
         void handleKeyPressed(KeyEvent e) {}
         void handleKeyReleased(KeyEvent e) {}
+        void handleMouseMoved(MouseEvent e) {}
     }
 
     /**
@@ -62,6 +67,17 @@ public class AppController {
      * switch states based on the next user action
      */
     ControllerState ready = new ControllerState() {
+
+        @Override
+        void handleMouseMoved(MouseEvent e) {
+            if (model.contains(e.getX(), e.getY(), 5)) {
+                System.out.println("mouse movement in range of a line");
+                iModel.setHovered(model.whichEntity(e.getX(), e.getY(), 5));
+            } else {
+                iModel.clearHovered();
+            }
+        }
+
         @Override
         void handlePressed(MouseEvent e) {
             prevX = e.getX();

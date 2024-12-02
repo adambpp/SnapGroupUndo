@@ -1,7 +1,7 @@
 package org.adam.gui.asn4;
 
 public class DLine {
-    private double x1, y1, x2, y2, scale;
+    private double x1, y1, x2, y2, scale, rotationVal;
     private Endpoint endpoint1, endpoint2;
     public enum Endpoints {ENDPOINT_1, ENDPOINT_2}
     private Endpoints curEndpoint;
@@ -12,6 +12,7 @@ public class DLine {
         this.x2 = x2;
         this.y2 = y2;
         this.scale = 1.0;
+        this.rotationVal = 0.0;
     }
 
     public boolean contains(double x, double y, double threshold) {
@@ -23,7 +24,7 @@ public class DLine {
         double ratioB = (x2 - x1) / length;
         double ratioC = -1 * ((y1 - y2) * x1 + (x2 - x1) * y1) / length;
         double distFromLine = Math.abs((ratioA * x) + (ratioB * y) + ratioC); // Ax + By + C
-        System.out.println("distFromLine: " + distFromLine);
+//        System.out.println("distFromLine: " + distFromLine);
         return distFromLine <= threshold || distFromLine == 0;
     }
 
@@ -47,6 +48,13 @@ public class DLine {
         this.y1 += nY;
         this.x2 += nX;
         this.y2 += nY;
+    }
+
+    public void scaleLine(double lineScale) {
+
+    }
+
+    public void rotateLine(double rotationAmount) {
     }
 
     /*
@@ -74,6 +82,10 @@ public class DLine {
         return scale;
     }
 
+    public double getRotationVal() {
+        return rotationVal;
+    }
+
     public Endpoint getEndpoint1() {
         return endpoint1;
     }
@@ -97,6 +109,10 @@ public class DLine {
 
     public void setScale(double scale) {
         this.scale = scale;
+    }
+
+    public void setRotationVal(double rotationVal) {
+        this.rotationVal = rotationVal;
     }
 
     public void setCurEndpoint(Integer endpoint) {

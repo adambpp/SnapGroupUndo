@@ -53,7 +53,7 @@ public class DView extends StackPane implements Subscriber{
         gc.clearRect(0, 0, myCanvas.getWidth(), myCanvas.getHeight());
         drawGrid();
         for (DLine dl : model.getLines() ) {
-
+            gc.save();
             // draw hover line
             if (dl == imodel.getHovered()) {
                 gc.setLineWidth(10);

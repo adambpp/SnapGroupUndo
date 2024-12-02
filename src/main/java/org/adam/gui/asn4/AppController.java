@@ -119,6 +119,35 @@ public class AppController {
             } else if (e.isShiftDown()) {
                 System.out.println("shift key pressed, about to create new line");
                 currentState = createOrDeselect;
+
+            } else if (Objects.requireNonNull(e.getCode()) == KeyCode.UP) {
+                if (iModel.getSelected() != null) {
+                    DLine line = iModel.getSelected();
+                    // scale by adjusting both endpoints (making them longer)
+                    double newScale = line.getScale() + 0.25;
+                    line.setScale(newScale);
+                    System.out.println(line.getScale());
+                    model.scaleLine(line, newScale);
+
+                }
+            }else if (Objects.requireNonNull(e.getCode()) == KeyCode.DOWN) {
+                if (iModel.getSelected() != null) {
+                    DLine line = iModel.getSelected();
+                    // scale by adjusting both endpoints (making them shorter)
+                    double newScale = line.getScale() - 0.25;
+                    line.setScale(newScale);
+                    System.out.println(line.getScale());
+                    model.scaleLine(line, newScale);
+                }
+            } else if (Objects.requireNonNull(e.getCode()) == KeyCode.LEFT) {
+                if (iModel.getSelected() != null) {
+                    System.out.println("line is being rotated");
+                    model.rotateLine(iModel.getSelected(), 50);
+                }
+            } else if (Objects.requireNonNull(e.getCode()) == KeyCode.RIGHT) {
+                if (iModel.getSelected() != null) {
+
+                }
             }
         }
 

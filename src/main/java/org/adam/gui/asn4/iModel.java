@@ -53,6 +53,10 @@ public class iModel {
         notifySubscribers();
     }
 
+    public void somethingChanged() {
+        notifySubscribers();
+    }
+
     /**
      * Adds a subscriber to the publishing/subscribe pattern
      * @param s: subscriber to add

@@ -47,6 +47,16 @@ public class LineModel {
         notifySubscribers();
     }
 
+    public void scaleLine(DLine line, double scale) {
+        line.scaleLine(scale);
+        notifySubscribers();
+    }
+
+    public void rotateLine(DLine line, double rotation_amount) {
+        line.rotateLine(rotation_amount);
+        notifySubscribers();
+    }
+
     /**
      * Checks to see any lines in the model are within bounds of an x and y and threshold
      *

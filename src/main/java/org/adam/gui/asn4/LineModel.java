@@ -42,19 +42,32 @@ public class LineModel {
         notifySubscribers();
     }
 
-    public void moveLine(DLine line, double nX, double nY) {
-        line.move(nX, nY);
+    public void moveLine(List<DLine> lines, double nX, double nY) {
+        lines.forEach(line -> line.move(nX, nY));
         notifySubscribers();
     }
 
-    public void scaleLine(DLine line, double scale) {
-        line.scaleLine(scale);
+    public void scaleLine(List<DLine> lines, double scale, int UpOrDown) {
+        lines.forEach(line -> line.scaleLine(scale, UpOrDown));
         notifySubscribers();
     }
 
-    public void rotateLine(DLine line, double rotation_amount) {
-        line.rotateLine(rotation_amount);
+    public void rotateLine(List<DLine> lines, double rotation_amount) {
+        lines.forEach(line -> line.rotateLine(rotation_amount));
         notifySubscribers();
+    }
+
+    public DLine findLineWithCurEndpoint(List<DLine> lines) {
+        for(DLine line : lines ) {
+            if(line.getCurEndpoint() != null) {
+                return line;
+            }
+        }
+        return null;
+    }
+
+    public void clearEndpointSelection(List<DLine> lines) {
+        lines.forEach(DLine::clearEndpointSelection);
     }
 
     /**

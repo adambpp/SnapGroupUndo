@@ -1,14 +1,16 @@
 package org.adam.gui.asn4;
 
 import java.util.ArrayList;
+import java.util.List;
 
 public class iModel {
-    private DLine selected;
+    private ArrayList<DLine> selected;
     private DLine hovered;
+    private DLine newLine;
     private ArrayList<Subscriber> subs;
 
     public iModel() {
-        selected = null;
+        selected = new ArrayList<>();
         subs = new ArrayList<>();
     }
 
@@ -17,8 +19,8 @@ public class iModel {
      *
      * @param line: A line object to be set as selected
      */
-    public void setSelected(DLine line) {
-        selected = line;
+    public void addToSelection(DLine line) {
+        selected.add(line);
         notifySubscribers();
     }
 
@@ -27,12 +29,17 @@ public class iModel {
         notifySubscribers();
     }
 
+    public void setNewLine(DLine line) {
+        newLine = line;
+        notifySubscribers();
+    }
+
     /**
      * Gets the selected line so that the view and controller can perform operations on it
      *
      * @return: The selected line
      */
-    public DLine getSelected() {
+    public List<DLine> getSelection() {
         return selected;
     }
 
@@ -40,11 +47,15 @@ public class iModel {
         return hovered;
     }
 
+    public DLine getNewLine() {
+        return newLine;
+    }
+
     /**
      * Clear the currently selected line by setting selected to null
      */
     public void clearSelection() {
-        selected = null;
+        selected.clear();
         notifySubscribers();
     }
 

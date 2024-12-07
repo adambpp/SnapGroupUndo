@@ -1,6 +1,8 @@
 package org.adam.gui.asn4;
 
-public class DLine {
+import java.util.List;
+
+public class DLine implements Groupable {
     private double x1, y1, x2, y2, scale, rotationVal;
     private Endpoint endpoint1, endpoint2;
     public enum Endpoints {ENDPOINT_1, ENDPOINT_2}
@@ -28,6 +30,16 @@ public class DLine {
         return distFromLine <= threshold || distFromLine == 0;
     }
 
+    @Override
+    public boolean isGroup() {
+        return false;
+    }
+
+    @Override
+    public List<Groupable> getChildren() {
+        return List.of();
+    }
+
     public void adjust(double x2, double y2) {
         this.x2 = x2;
         this.y2 = y2;
@@ -50,11 +62,51 @@ public class DLine {
         this.y2 += nY;
     }
 
-    public void scaleLine(double lineScale) {
+    public void scaleLine(double lineScale, Integer upOrDown) {
+        double centerX = (x1 + x2) / 2;
+        double centerY = (y1 + y2) / 2;
+        double lineScaleLengthX;
+        double lineScaleLengthY;
 
+        if (upOrDown == 0) { // UP
+            lineScaleLengthX = (Math.max(x1, x2 - centerX)) * lineScale;
+            lineScaleLengthY = (Math.max(y1, y2 - centerY)) * lineScale;
+        } else { // DOWN
+            lineScaleLengthX = (Math.min(x2, x1 - centerX)) * lineScale;
+            lineScaleLengthY = (Math.min(y2, y1 - centerY)) * lineScale;
+        }
+
+        if (x1 < x2) {
+            adjustEndpoint(Endpoints.ENDPOINT_1, x1 - lineScaleLengthX, y1);
+            adjustEndpoint(Endpoints.ENDPOINT_2, x2 + lineScaleLengthX, y2);
+        } else if (x2 < x1) {
+            adjustEndpoint(Endpoints.ENDPOINT_1, x1 + lineScaleLengthX, y1);
+            adjustEndpoint(Endpoints.ENDPOINT_2, x2 - lineScaleLengthX, y2);
+        }
+        if (y1 < y2) {
+            adjustEndpoint(Endpoints.ENDPOINT_1, x1, y1 - lineScaleLengthY);
+            adjustEndpoint(Endpoints.ENDPOINT_2, x2, y2 + lineScaleLengthY);
+        }
+        else if (y2 < y1) {
+            adjustEndpoint(Endpoints.ENDPOINT_1, x1, y1 + lineScaleLengthY);
+            adjustEndpoint(Endpoints.ENDPOINT_2, x2, y2 - lineScaleLengthY);
+        }
     }
 
     public void rotateLine(double rotationAmount) {
+        double centerX = (x1 + x2) / 2;
+        double centerY = (y1 + y2) / 2;
+        double dx1 = x1 - centerX;
+        double dy1 = y1 - centerY;
+        double dx2 = x2 - centerX;
+        double dy2 = y2 - centerY;
+        double angle = Math.toRadians(rotationAmount);
+
+        x1 = (dx1 * Math.cos(angle) + dy1 * Math.sin(angle)) + centerX;
+        x2 = (dx2 * Math.cos(angle) + dy2 * Math.sin(angle)) + centerX;
+
+        y1 = (-dx1 * Math.sin(angle) + dy1 * Math.cos(angle)) + centerY;
+        y2 = (-dx2 * Math.sin(angle) + dy2 * Math.cos(angle)) + centerY;
     }
 
     /*

@@ -3,7 +3,6 @@ package org.adam.gui.asn4;
 import javafx.application.Platform;
 import javafx.scene.canvas.Canvas;
 import javafx.scene.canvas.GraphicsContext;
-import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.StackPane;
 import javafx.scene.paint.Color;
 
@@ -63,7 +62,8 @@ public class DView extends StackPane implements Subscriber{
 
             // draw normal line
             gc.setLineWidth(2);
-            gc.setStroke(dl == imodel.getSelected() ? Color.PINK : Color.PURPLE);
+//            gc.setStroke(dl == imodel.getSelection() ? Color.PINK : Color.PURPLE);
+            gc.setStroke(imodel.getSelection().contains(dl) ? Color.PINK : Color.PURPLE);
             gc.strokeLine(dl.getX1(), dl.getY1(), dl.getX2(), dl.getY2());
 
             drawEndpoints(dl, dl.getX1(), dl.getY1(), dl.getX2(), dl.getY2());
@@ -97,9 +97,9 @@ public class DView extends StackPane implements Subscriber{
      * @param y2: y pos for endpoint2
      */
     private void drawEndpoints(DLine line, double x1, double y1, double x2, double y2) {
-        if (line == imodel.getSelected()) {
+        if (imodel.getSelection().contains(line)) {
             //gc.setFill(Color.LIGHTGRAY);
-            gc.setStroke(line == imodel.getSelected() ? Color.PINK : Color.PURPLE);
+            gc.setStroke(line == imodel.getSelection() ? Color.PINK : Color.PURPLE);
             gc.setStroke(Color.BLACK);
             gc.setLineWidth(1);
 

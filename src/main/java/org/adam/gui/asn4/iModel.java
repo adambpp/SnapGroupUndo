@@ -4,23 +4,33 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class iModel {
-    private ArrayList<DLine> selected;
+    private ArrayList<DLine> selection;
     private DLine hovered;
-    private DLine newLine;
+    private DLine Selected;
     private ArrayList<Subscriber> subs;
 
     public iModel() {
-        selected = new ArrayList<>();
+        selection = new ArrayList<>();
         subs = new ArrayList<>();
     }
 
     /**
-     * Set the currently selected line
+     * Add a line to the selection ArrayList
      *
-     * @param line: A line object to be set as selected
+     * @param line: A line object to be added to the selection list
      */
     public void addToSelection(DLine line) {
-        selected.add(line);
+        selection.add(line);
+        notifySubscribers();
+    }
+
+    /**
+     * Remove a line from the selection list
+     *
+     * @param line: A line object to be removed
+     */
+    public void removeFromSelection(DLine line) {
+        selection.remove(line);
         notifySubscribers();
     }
 
@@ -29,8 +39,8 @@ public class iModel {
         notifySubscribers();
     }
 
-    public void setNewLine(DLine line) {
-        newLine = line;
+    public void setSelected(DLine line) {
+        Selected = line;
         notifySubscribers();
     }
 
@@ -40,22 +50,23 @@ public class iModel {
      * @return: The selected line
      */
     public List<DLine> getSelection() {
-        return selected;
+        return selection;
     }
 
     public DLine getHovered() {
         return hovered;
     }
 
-    public DLine getNewLine() {
-        return newLine;
+    public DLine getSelected() {
+        return Selected;
     }
 
     /**
      * Clear the currently selected line by setting selected to null
      */
     public void clearSelection() {
-        selected.clear();
+        selection.clear();
+        hovered = null;
         notifySubscribers();
     }
 

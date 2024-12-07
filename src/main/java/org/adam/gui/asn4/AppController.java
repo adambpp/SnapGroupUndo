@@ -47,12 +47,6 @@ public class AppController {
         currentState.handleMouseMoved(e);
     }
 
-    private void snapToGrid(DLine line, double lineX, double lineY) {
-        double roundedX = Math.round(lineX / 20) * 20;
-        double roundedY = Math.round(lineY / 20) * 20;
-        model.adjustLine(line, roundedX, roundedY);
-    }
-
     private abstract class ControllerState {
         void handlePressed(MouseEvent e) {}
         void handleDragged(MouseEvent e) {}
@@ -86,7 +80,22 @@ public class AppController {
 
             // first check if the mouse click is close enough to a line
             if (model.contains(e.getX(), e.getY(), 5)) {
-                imodel.addToSelection(model.whichEntity(e.getX(), e.getY(), 5));
+                DLine clickedLine = model.whichEntity(e.getX(), e.getY(), 5);
+
+                // if selection list is empty then we can add the clicked line to it
+                if (imodel.getSelection().isEmpty()) {
+                    imodel.clearSelection();
+                    imodel.addToSelection(clickedLine);
+                    imodel.setSelected(clickedLine);
+                } else if (!imodel.getSelection().contains(clickedLine)) {
+                    // if it's not empty and doesn't contain the clicked line then
+                    // clear it first since we are not holding down control here
+                    imodel.clearSelection();
+                    imodel.addToSelection(clickedLine);
+                    imodel.setSelected(clickedLine);
+                }
+                // else if the clicked line is already part of the selection then we don't need to do anything
+
 
                 // check if we clicked on an endpoint before trying to move a line
                 for (DLine line: imodel.getSelection()) {
@@ -124,13 +133,15 @@ public class AppController {
                 System.out.println("shift key pressed, about to create new line");
                 currentState = createOrDeselect;
 
+            } else if (e.isControlDown()) {
+                currentState = multipleSelect;
             } else if (Objects.requireNonNull(e.getCode()) == KeyCode.UP) {
                 if (imodel.getSelection() != null) {
                     model.scaleLine(imodel.getSelection(), 0.05, 0);
                 }
             }else if (Objects.requireNonNull(e.getCode()) == KeyCode.DOWN) {
                 if (imodel.getSelection() != null) {
-                    model.scaleLine(imodel.getSelection(), -0.05, 1);
+                    model.scaleLine(imodel.getSelection(), 0.05, 1);
                 }
             } else if (Objects.requireNonNull(e.getCode()) == KeyCode.LEFT) {
                 if (imodel.getSelection() != null) {
@@ -138,7 +149,7 @@ public class AppController {
                 }
             } else if (Objects.requireNonNull(e.getCode()) == KeyCode.RIGHT) {
                 if (imodel.getSelection() != null) {
-
+                    model.rotateLine(imodel.getSelection(), -25);
                 }
             }
         }
@@ -148,6 +159,41 @@ public class AppController {
             double diffY = mouseY - endpY;
             double dist = Math.sqrt((diffX * diffX) + (diffY * diffY));
             return dist <= r * 2;
+        }
+    };
+
+    /**
+     * Multiple Select state. This is where we go after control is held down, to add multiple lines to our selection
+     */
+    ControllerState multipleSelect = new ControllerState() {
+        @Override
+        void handleMouseMoved(MouseEvent e) {
+            if (model.contains(e.getX(), e.getY(), 5)) {
+                imodel.setHovered(model.whichEntity(e.getX(), e.getY(), 5));
+            } else {
+                imodel.clearHovered();
+            }
+        }
+
+        @Override
+        void handlePressed(MouseEvent e) {
+            if (model.contains(e.getX(), e.getY(), 5)) {
+                DLine clickedLine = model.whichEntity(e.getX(), e.getY(), 5);
+
+                // add line to selection if not already in selection
+                if (!imodel.getSelection().contains(clickedLine)) {
+                    imodel.addToSelection(clickedLine);
+                } else {
+                    // remove line from selection if already in selection list
+                    imodel.removeFromSelection(clickedLine);
+                }
+
+            }
+        }
+
+        @Override
+        void handleKeyReleased(KeyEvent e) {
+            currentState = ready;
         }
     };
 
@@ -167,7 +213,9 @@ public class AppController {
         @Override
         void handleDragged(MouseEvent e) {
             DLine line = model.addLine(e.getX(), e.getY(), e.getX(), e.getY());
-            imodel.setNewLine(line);
+            // clear selection array, the set single selection to the new line, and then add it to selection array
+            imodel.clearSelection();
+            imodel.setSelected(line);
             imodel.addToSelection(line);
 
             // this is messy af, change later
@@ -195,12 +243,12 @@ public class AppController {
         @Override
         void handleDragged(MouseEvent e) {
             System.out.println("creating line in creating state");
-            model.adjustLine(imodel.getNewLine(),e.getX(),e.getY());
+            model.adjustLine(imodel.getSelected(),e.getX(),e.getY());
         }
 
         @Override
         void handleReleased(MouseEvent e) {
-            DLine line = imodel.getNewLine();
+            DLine line = imodel.getSelected();
             System.out.println("mouse released in creating state, going back to ready");
             double roundedX = Math.round(line.getX2() / 20) * 20;
             double roundedY = Math.round(line.getY2() / 20) * 20;

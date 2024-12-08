@@ -6,10 +6,12 @@ import java.util.List;
 public class LineModel {
     private ArrayList<Subscriber> subs;
     private ArrayList<DLine> lines;
+    private RubberBand rubberband;
 
     public LineModel() {
         subs = new ArrayList<>();
         lines = new ArrayList<>();
+        rubberband = null;
     }
 
     /**
@@ -68,6 +70,24 @@ public class LineModel {
 
     public void clearEndpointSelection(List<DLine> lines) {
         lines.forEach(DLine::clearEndpointSelection);
+    }
+
+    public void initRubberband(double x, double y) {
+        rubberband = new RubberBand(x, y);
+    }
+
+    public RubberBand getRubberband() {
+        return rubberband;
+    }
+
+    public void resizeRubberband(double nWidth, double nHeight) {
+        rubberband.setWidth(nWidth);
+        rubberband.setHeight(nHeight);
+        notifySubscribers();
+    }
+
+    public void clearRubberband() {
+        rubberband = null;
     }
 
     /**

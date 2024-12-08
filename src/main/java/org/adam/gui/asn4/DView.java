@@ -68,6 +68,7 @@ public class DView extends StackPane implements Subscriber{
 
             drawEndpoints(dl, dl.getX1(), dl.getY1(), dl.getX2(), dl.getY2());
         }
+        drawRubberBand();
     }
 
     /**
@@ -83,6 +84,18 @@ public class DView extends StackPane implements Subscriber{
         // y axis
         for (int j = 0; j <= 800; j+= 20) {
             gc.strokeLine(0, j, 1000, j);
+        }
+    }
+
+    public void drawRubberBand() {
+        RubberBand box = model.getRubberband();
+        if (box != null) {
+            gc.save();
+            gc.setStroke(Color.RED);
+            gc.setLineWidth(2);
+            gc.setLineDashes(10, 10);
+            gc.strokeRect(box.getX(), box.getY(), box.getWidth(), box.getHeight());
+            gc.restore();
         }
     }
 

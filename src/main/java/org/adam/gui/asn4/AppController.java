@@ -115,7 +115,8 @@ public class AppController {
                 }
                 // clear selection otherwise
             } else {
-                imodel.clearSelection();
+                model.initRubberband(e.getX(), e.getY());
+                currentState = rubberBandOrDeselect;
             }
 
         }
@@ -131,7 +132,7 @@ public class AppController {
                 }
             } else if (e.isShiftDown()) {
                 System.out.println("shift key pressed, about to create new line");
-                currentState = createOrDeselect;
+                currentState = creating;
 
             } else if (e.isControlDown()) {
                 currentState = multipleSelect;
@@ -202,16 +203,44 @@ public class AppController {
      *  we clear selection and go back to ready state
      */
     //TODO: This should be changed to something like "SelectionBoxOrDeselect" (for part 2)
-    ControllerState createOrDeselect = new ControllerState() {
+    ControllerState rubberBandOrDeselect = new ControllerState() {
+
+        @Override
+        void handleDragged(MouseEvent e) {
+            dX = e.getX() - prevX;
+            dY = e.getY() - prevY;
+            model.resizeRubberband(dX, dY);
+        }
+
+        @Override
+        void handleReleased(MouseEvent e) {
+            System.out.println("mouse released rubberBandOrDeselect, deselecting and going back to ready");
+            model.clearRubberband();
+            imodel.clearSelection();
+            currentState = ready;
+        }
+    };
+
+    /**
+     * Creating state. This is the state where lines get created (obviously). Line is being created/constantly
+     * resized until the mouse is released.
+     */
+    ControllerState creating = new ControllerState() {
         @Override
         void handleKeyReleased(KeyEvent e) {
-            if (Objects.requireNonNull(e.getCode()) == KeyCode.SHIFT) {
+            if (e.getCode() == KeyCode.SHIFT) {
                 currentState = ready;
             }
         }
 
         @Override
         void handleDragged(MouseEvent e) {
+            System.out.println("creating line in creating state");
+            model.adjustLine(imodel.getSelected(),e.getX(),e.getY());
+        }
+
+        @Override
+        void handlePressed(MouseEvent e) {
             DLine line = model.addLine(e.getX(), e.getY(), e.getX(), e.getY());
             // clear selection array, the set single selection to the new line, and then add it to selection array
             imodel.clearSelection();
@@ -224,26 +253,6 @@ public class AppController {
             line.setCurEndpoint(0);
             model.adjustEndpoint(line, roundedX, roundedY);
             line.clearEndpointSelection();
-            currentState = creating;
-        }
-
-        @Override
-        void handleReleased(MouseEvent e) {
-            System.out.println("mouse released createOrDeselect, deselecting and going back to ready");
-            imodel.clearSelection();
-            currentState = ready;
-        }
-    };
-
-    /**
-     * Creating state. This is the state where lines get created (obviously). Line is being created/constantly
-     * resized until the mouse is released.
-     */
-    ControllerState creating = new ControllerState() {
-        @Override
-        void handleDragged(MouseEvent e) {
-            System.out.println("creating line in creating state");
-            model.adjustLine(imodel.getSelected(),e.getX(),e.getY());
         }
 
         @Override

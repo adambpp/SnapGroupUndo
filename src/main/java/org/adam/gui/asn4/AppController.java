@@ -4,6 +4,7 @@ import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyEvent;
 import javafx.scene.input.MouseEvent;
 
+import java.util.List;
 import java.util.Objects;
 
 public class AppController {
@@ -178,6 +179,9 @@ public class AppController {
 
         @Override
         void handlePressed(MouseEvent e) {
+            model.initRubberband(e.getX(), e.getY());
+            prevX = e.getX();
+            prevY = e.getY();
             if (model.contains(e.getX(), e.getY(), 5)) {
                 DLine clickedLine = model.whichEntity(e.getX(), e.getY(), 5);
 
@@ -193,17 +197,53 @@ public class AppController {
         }
 
         @Override
+        void handleDragged(MouseEvent e) {
+            dX = e.getX() - prevX;
+            dY = e.getY() - prevY;
+            model.resizeRubberband(dX, dY);
+        }
+
+        @Override
         void handleKeyReleased(KeyEvent e) {
+            // get list of lines within the rectangle
+            List<DLine> lines = model.rubberBandLineSelect();
+            for (DLine line: lines) {
+                // remove line from selection if already in selection list
+                if (imodel.getSelection().contains(line)) {
+                    imodel.removeFromSelection(line);
+                } else {
+                    // add line to selection if not already in selection
+                    imodel.addToSelection(line);
+                }
+            }
+            model.clearRubberband();
             currentState = ready;
         }
     };
 
     /**
-     *  This is an intermediary state. If a drag is detected after the initial press, we go to creating, otherwise
-     *  we clear selection and go back to ready state
+     *  In this state we either resize the rubber band or deselect all lines and clear the rubber band
+     *  (yes this means I am always creating a rubberband box even when there is no mouse drag)
      */
-    //TODO: This should be changed to something like "SelectionBoxOrDeselect" (for part 2)
     ControllerState rubberBandOrDeselect = new ControllerState() {
+
+        @Override
+        void handleDragged(MouseEvent e) {
+            // I could initialize the rubber band here instead of in ready state perhaps
+            currentState = rubberBandSelectOnly;
+        }
+
+        @Override
+        void handleReleased(MouseEvent e) {
+            System.out.println("mouse released rubberBandOrDeselect, deselecting and going back to ready");
+            imodel.clearSelection();
+            currentState = ready;
+        }
+    };
+
+    // THIS STATE SHOULD ONLY SELECT WHAT IS IN THE RUBBER BAND BOX
+    // AND THEN CTRL CLICK DRAG WILL BOTH SELECT AND UNSELECT, SO I NEED TO MAKE ANOTHER STATE
+    ControllerState rubberBandSelectOnly = new ControllerState() {
 
         @Override
         void handleDragged(MouseEvent e) {
@@ -214,9 +254,14 @@ public class AppController {
 
         @Override
         void handleReleased(MouseEvent e) {
-            System.out.println("mouse released rubberBandOrDeselect, deselecting and going back to ready");
+            // get list of lines within the rectangle
+            List<DLine> lines = model.rubberBandLineSelect();
+            for (DLine line: lines) {
+                if (!imodel.getSelection().contains(line)) {
+                    imodel.addToSelection(line);
+                }
+            }
             model.clearRubberband();
-            imodel.clearSelection();
             currentState = ready;
         }
     };

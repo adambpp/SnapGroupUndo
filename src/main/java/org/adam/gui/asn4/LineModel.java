@@ -86,6 +86,16 @@ public class LineModel {
         notifySubscribers();
     }
 
+    public List<DLine> rubberBandLineSelect() {
+        ArrayList<DLine> linesWithinBounds = new ArrayList<>();
+        for(DLine line : lines) {
+            if (rubberband.contains(line.getX1(), line.getY1()) || rubberband.contains(line.getX2(), line.getY2())) {
+                linesWithinBounds.add(line);
+            }
+        }
+        return linesWithinBounds;
+    }
+
     public void clearRubberband() {
         rubberband = null;
     }

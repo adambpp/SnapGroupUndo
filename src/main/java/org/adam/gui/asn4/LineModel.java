@@ -26,6 +26,13 @@ public class LineModel {
     public DLine addLine(double x1, double y1, double x2, double y2) {
         DLine line = new DLine(x1, y1, x2, y2);
         elements.add(line);
+        notifySubscribers();
+        return line;
+    }
+
+    public DLine addLine(DLine line) {
+        elements.add(line);
+        notifySubscribers();
         return line;
     }
 
@@ -119,28 +126,32 @@ public class LineModel {
 
     public List<Groupable> rubberBandLineSelect() {
         List<Groupable> linesWithinBounds = new ArrayList<>();
+        if (rubberband != null) {
 
 
-        for(Groupable element : elements) {
 
-            // check if a line object is within bounds
-            if (element instanceof DLine line) {
-                if (rubberband.contains(line.getX1(), line.getY1()) || rubberband.contains(line.getX2(), line.getY2())) {
-                    linesWithinBounds.add(line);
-                }
-            } else if (element instanceof DGroup group) {
-                // loop through groups children to see if any of its lines are within bounds
-                for (Groupable groupchild : group.getChildren()) {
-                    if (groupchild instanceof DLine line) {
-                        if (rubberband.contains(line.getX1(), line.getY1()) || rubberband.contains(line.getX2(), line.getY2())) {
-                            linesWithinBounds.add(element);
-                            break;
+            for (Groupable element : elements) {
+
+                // check if a line object is within bounds
+                if (element instanceof DLine line) {
+                    if (rubberband.contains(line.getX1(), line.getY1()) || rubberband.contains(line.getX2(), line.getY2())) {
+                        linesWithinBounds.add(line);
+                    }
+                } else if (element instanceof DGroup group) {
+                    // loop through groups children to see if any of its lines are within bounds
+                    for (Groupable groupchild : group.getChildren()) {
+                        if (groupchild instanceof DLine line) {
+                            if (rubberband.contains(line.getX1(), line.getY1()) || rubberband.contains(line.getX2(), line.getY2())) {
+                                linesWithinBounds.add(element);
+                                break;
+                            }
                         }
                     }
                 }
             }
         }
         return linesWithinBounds;
+
     }
 
     public void clearRubberband() {

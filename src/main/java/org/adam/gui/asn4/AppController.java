@@ -183,6 +183,10 @@ public class AppController {
                 if (imodel.getSelection() != null) {
                     model.rotateElement(imodel.getSelection(), -5);
                 }
+            } else if (Objects.requireNonNull(e.getCode()) == KeyCode.Z) {
+                imodel.handleUndo();
+            } else if (Objects.requireNonNull(e.getCode()) == KeyCode.R) {
+                imodel.handleRedo();
             }
         }
 
@@ -337,7 +341,10 @@ public class AppController {
             double roundedX = Math.round(line.getX2() / 20) * 20;
             double roundedY = Math.round(line.getY2() / 20) * 20;
             model.adjustLine(line, roundedX, roundedY);
-            //imodel.addToSelection(line);
+            CreateCommand cmd = new CreateCommand(model, line);
+            // clearing the redo stack first so that I don't kill my grandmother (joke made by Carl Gutwin in during a lecture iirc)
+            imodel.clearRedoStack();
+            imodel.addToUndoStack(cmd);
             currentState = ready;
         }
     };

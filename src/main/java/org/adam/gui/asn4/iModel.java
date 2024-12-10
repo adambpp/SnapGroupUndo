@@ -2,16 +2,51 @@ package org.adam.gui.asn4;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Stack;
 
 public class iModel {
     private ArrayList<Groupable> selection;
     private Groupable hovered;
     private DLine Selected;
     private ArrayList<Subscriber> subs;
+    private Stack<DCommand> undoStack = new Stack<>();
+    private Stack<DCommand> redoStack = new Stack<>();
 
     public iModel() {
         selection = new ArrayList<>();
         subs = new ArrayList<>();
+    }
+
+    public void addToUndoStack(DCommand cmd) {
+        System.out.println(cmd.toString());
+        undoStack.push(cmd);
+    }
+
+    public void clearRedoStack() {
+        redoStack.clear();
+    }
+
+    public void handleUndo() {
+        System.out.println("type shi");
+        System.out.println(undoStack.size());
+        if (!undoStack.isEmpty()) {
+            DCommand cmd = undoStack.pop();
+            cmd.undo();
+            redoStack.push(cmd);
+        }
+        System.out.println(undoStack.size());
+    }
+
+    public void handleRedo() {
+        System.out.println("handling redo");
+        System.out.println(redoStack.size());
+        if (!redoStack.isEmpty()) {
+            System.out.println(redoStack.peek());
+            DCommand cmd = redoStack.pop();
+            cmd.doit();
+            undoStack.push(cmd);
+        }
+        System.out.println(redoStack.size());
     }
 
     /**

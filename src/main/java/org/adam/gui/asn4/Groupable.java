@@ -7,4 +7,14 @@ public interface Groupable {
 
     List<Groupable> getChildren();
 
+    void scale(double scaleFactor, Integer upOrDown);
+
+    void scale(double scaleFactor, double centerX, double centerY, Integer upOrDown);
+
+    void rotate(double rotationAmount);
+
+    void move(double nX, double nY);
+
+    boolean contains(double x, double y, double threshold);
+
 }

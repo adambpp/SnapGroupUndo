@@ -30,16 +30,6 @@ public class DLine implements Groupable {
         return distFromLine <= threshold || distFromLine == 0;
     }
 
-    @Override
-    public boolean isGroup() {
-        return false;
-    }
-
-    @Override
-    public List<Groupable> getChildren() {
-        return List.of();
-    }
-
     public void adjust(double x2, double y2) {
         this.x2 = x2;
         this.y2 = y2;
@@ -55,6 +45,17 @@ public class DLine implements Groupable {
         }
     }
 
+    @Override
+    public boolean isGroup() {
+        return false;
+    }
+
+    @Override
+    public List<Groupable> getChildren() {
+        return List.of();
+    }
+
+    @Override
     public void move(double nX, double nY) {
         this.x1 += nX;
         this.y1 += nY;
@@ -62,18 +63,19 @@ public class DLine implements Groupable {
         this.y2 += nY;
     }
 
-    public void scaleLine(double lineScale, Integer upOrDown) {
+    @Override
+    public void scale(double scaleFactor, Integer upOrDown) {
         double centerX = (x1 + x2) / 2;
         double centerY = (y1 + y2) / 2;
         double lineScaleLengthX;
         double lineScaleLengthY;
 
         if (upOrDown == 0) { // UP
-            lineScaleLengthX = (Math.max(x1, x2 - centerX)) * lineScale;
-            lineScaleLengthY = (Math.max(y1, y2 - centerY)) * lineScale;
+            lineScaleLengthX = (Math.max(x1, x2 - centerX)) * scaleFactor;
+            lineScaleLengthY = (Math.max(y1, y2 - centerY)) * scaleFactor;
         } else { // DOWN
-            lineScaleLengthX = (Math.min(x2, x1 - centerX)) * lineScale;
-            lineScaleLengthY = (Math.min(y2, y1 - centerY)) * lineScale;
+            lineScaleLengthX = (Math.min(x2, x1 - centerX)) * scaleFactor;
+            lineScaleLengthY = (Math.min(y2, y1 - centerY)) * scaleFactor;
         }
 
         if (x1 < x2) {
@@ -93,7 +95,12 @@ public class DLine implements Groupable {
         }
     }
 
-    public void rotateLine(double rotationAmount) {
+    // this method does not get used in this class
+    @Override
+    public void scale(double scaleFactor, double centerX, double centerY, Integer upOrDown) {}
+
+    @Override
+    public void rotate(double rotationAmount) {
         double centerX = (x1 + x2) / 2;
         double centerY = (y1 + y2) / 2;
         double dx1 = x1 - centerX;

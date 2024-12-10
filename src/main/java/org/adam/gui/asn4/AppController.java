@@ -81,25 +81,26 @@ public class AppController {
 
             // first check if the mouse click is close enough to a line
             if (model.contains(e.getX(), e.getY(), 5)) {
-                DLine clickedLine = model.whichEntity(e.getX(), e.getY(), 5);
+                Groupable clickedElement = model.whichEntity(e.getX(), e.getY(), 5);
 
                 // if selection list is empty then we can add the clicked line to it
                 if (imodel.getSelection().isEmpty()) {
                     imodel.clearSelection();
-                    imodel.addToSelection(clickedLine);
-                    imodel.setSelected(clickedLine);
-                } else if (!imodel.getSelection().contains(clickedLine)) {
+                    imodel.addToSelection(clickedElement);
+                    //imodel.setSelected(clickedElement);
+                } else if (!imodel.getSelection().contains(clickedElement)) {
                     // if it's not empty and doesn't contain the clicked line then
                     // clear it first since we are not holding down control here
                     imodel.clearSelection();
-                    imodel.addToSelection(clickedLine);
-                    imodel.setSelected(clickedLine);
+                    imodel.addToSelection(clickedElement);
+                    //imodel.setSelected(clickedElement);
                 }
                 // else if the clicked line is already part of the selection then we don't need to do anything
 
 
                 // check if we clicked on an endpoint before trying to move a line
-                for (DLine line: imodel.getSelection()) {
+                for (Groupable element: imodel.getSelection()) {
+                    if (element instanceof DLine line) {
                     if (isWithinEndpoint(e.getX(), e.getY(), line.getX1(), line.getY1(), 5)) {
                         System.out.println("Current endpoint set to endpoint 1");
                         line.setCurEndpoint(0);
@@ -108,7 +109,8 @@ public class AppController {
                         System.out.println("Current endpoint set to endpoint 2");
                         line.setCurEndpoint(1);
                         currentState = endpointAdjusting;
-                    }
+
+                    }                    }
                 }
                 // move the line if we were not on an endpoint
                 if (model.findLineWithCurEndpoint(imodel.getSelection()) == null) {
@@ -127,8 +129,10 @@ public class AppController {
             if (Objects.requireNonNull(e.getCode()) == KeyCode.DELETE || e.getCode() == KeyCode.BACK_SPACE) {
                 System.out.println("delete or backspace was pressed, deleting line");
                 if (imodel.getSelection() != null) {
-                    for (DLine line: imodel.getSelection()) {
-                        model.removeLine(line);
+                    for (Groupable element: imodel.getSelection()) {
+                        if (element instanceof DLine line) {
+                            model.removeLine(line);
+                        }
                     }
                 }
             } else if (e.isShiftDown()) {
@@ -137,7 +141,10 @@ public class AppController {
 
             } else if (e.isControlDown()) {
                 currentState = multipleSelect;
-            } else if (Objects.requireNonNull(e.getCode()) == KeyCode.UP) {
+
+            } else if (Objects.requireNonNull(e.getCode()) == KeyCode.G){
+                model.group(imodel.getSelection());
+            }else if (Objects.requireNonNull(e.getCode()) == KeyCode.UP) {
                 if (imodel.getSelection() != null) {
                     model.scaleLine(imodel.getSelection(), 0.05, 0);
                 }
@@ -171,7 +178,7 @@ public class AppController {
         @Override
         void handleMouseMoved(MouseEvent e) {
             if (model.contains(e.getX(), e.getY(), 5)) {
-                imodel.setHovered(model.whichEntity(e.getX(), e.getY(), 5));
+                imodel.setHovered((DLine) model.whichEntity(e.getX(), e.getY(), 5));
             } else {
                 imodel.clearHovered();
             }
@@ -183,7 +190,7 @@ public class AppController {
             prevX = e.getX();
             prevY = e.getY();
             if (model.contains(e.getX(), e.getY(), 5)) {
-                DLine clickedLine = model.whichEntity(e.getX(), e.getY(), 5);
+                DLine clickedLine = (DLine) model.whichEntity(e.getX(), e.getY(), 5);
 
                 // add line to selection if not already in selection
                 if (!imodel.getSelection().contains(clickedLine)) {

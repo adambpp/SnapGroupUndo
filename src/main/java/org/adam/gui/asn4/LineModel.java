@@ -5,12 +5,12 @@ import java.util.List;
 
 public class LineModel {
     private ArrayList<Subscriber> subs;
-    private ArrayList<DLine> lines;
+    private List<Groupable> elements;
     private RubberBand rubberband;
 
     public LineModel() {
         subs = new ArrayList<>();
-        lines = new ArrayList<>();
+        elements = new ArrayList<>();
         rubberband = null;
     }
 
@@ -19,18 +19,34 @@ public class LineModel {
      * @return: The Arraylist of lines
      */
 
-    public List<DLine> getLines() {
-        return lines;
+    public List<Groupable> getElements() {
+        return elements;
     }
 
     public DLine addLine(double x1, double y1, double x2, double y2) {
         DLine line = new DLine(x1, y1, x2, y2);
-        lines.add(line);
+        elements.add(line);
         return line;
     }
 
+    public void group(List<Groupable> sel) {
+        DGroup linegroup = new DGroup(sel);
+        sel.forEach(e -> removeLine((DLine) e));
+
+        elements.add(linegroup);
+        notifySubscribers();
+    }
+
+//    public void ungroup(DGroup linegroup) {
+//        List<Groupable> elements = linegroup.getChildren();
+//
+//        for(Groupable g : elements) {
+//            if(g instanceof DLine line) {}
+//        }
+//    }
+
     public void removeLine(DLine line) {
-        lines.remove(line);
+        elements.remove(line);
         notifySubscribers();
     }
 
@@ -44,32 +60,38 @@ public class LineModel {
         notifySubscribers();
     }
 
-    public void moveLine(List<DLine> lines, double nX, double nY) {
+    public void moveLine(List<Groupable> lines, double nX, double nY) {
         lines.forEach(line -> line.move(nX, nY));
         notifySubscribers();
     }
 
-    public void scaleLine(List<DLine> lines, double scale, int UpOrDown) {
-        lines.forEach(line -> line.scaleLine(scale, UpOrDown));
+    public void scaleLine(List<Groupable> lines, double scale, int UpOrDown) {
+        lines.forEach(line -> line.scale(scale, UpOrDown));
         notifySubscribers();
     }
 
-    public void rotateLine(List<DLine> lines, double rotation_amount) {
-        lines.forEach(line -> line.rotateLine(rotation_amount));
+    public void rotateLine(List<Groupable> lines, double rotation_amount) {
+        lines.forEach(line -> line.rotate(rotation_amount));
         notifySubscribers();
     }
 
-    public DLine findLineWithCurEndpoint(List<DLine> lines) {
-        for(DLine line : lines ) {
-            if(line.getCurEndpoint() != null) {
-                return line;
+    public DLine findLineWithCurEndpoint(List<Groupable> lines) {
+        for(Groupable element : lines ) {
+            if (element instanceof DLine line) {
+                if (line.getCurEndpoint() != null) {
+                    return line;
+                }
             }
         }
         return null;
     }
 
-    public void clearEndpointSelection(List<DLine> lines) {
-        lines.forEach(DLine::clearEndpointSelection);
+    public void clearEndpointSelection(List<Groupable> elements) {
+        for(Groupable element : elements ) {
+            if (element instanceof DLine line) {
+                line.clearEndpointSelection();
+            }
+        }
     }
 
     public void initRubberband(double x, double y) {
@@ -87,10 +109,14 @@ public class LineModel {
     }
 
     public List<DLine> rubberBandLineSelect() {
-        ArrayList<DLine> linesWithinBounds = new ArrayList<>();
-        for(DLine line : lines) {
-            if (rubberband.contains(line.getX1(), line.getY1()) || rubberband.contains(line.getX2(), line.getY2())) {
-                linesWithinBounds.add(line);
+        List<DLine> linesWithinBounds = new ArrayList<>();
+
+
+        for(Groupable element : elements) {
+            if (element instanceof DLine line) {
+                if (rubberband.contains(line.getX1(), line.getY1()) || rubberband.contains(line.getX2(), line.getY2())) {
+                    linesWithinBounds.add(line);
+                }
             }
         }
         return linesWithinBounds;
@@ -110,7 +136,7 @@ public class LineModel {
      */
 
     public boolean contains(double x, double y, double threshold) {
-        return lines.stream().anyMatch(e -> e.contains(x, y, threshold));
+        return elements.stream().anyMatch(e -> e.contains(x, y, threshold));
     }
 
     /**
@@ -121,8 +147,8 @@ public class LineModel {
      * @param threshold: distance between line and click that is valid
      * @return: the first entity found with the coords
      */
-    public DLine whichEntity(double x, double y, double threshold) {
-        return lines.stream()
+    public Groupable whichEntity(double x, double y, double threshold) {
+        return elements.stream()
                 .filter(e -> e.contains(x, y, threshold))
                 .findFirst()
                 .orElse(null);

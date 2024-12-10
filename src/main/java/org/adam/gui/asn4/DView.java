@@ -6,6 +6,8 @@ import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.layout.StackPane;
 import javafx.scene.paint.Color;
 
+import java.util.List;
+
 public class DView extends StackPane implements Subscriber{
 
     private double width, height;
@@ -51,24 +53,47 @@ public class DView extends StackPane implements Subscriber{
     private void draw() {
         gc.clearRect(0, 0, myCanvas.getWidth(), myCanvas.getHeight());
         drawGrid();
-        for (DLine dl : model.getLines() ) {
-            gc.save();
-            // draw hover line
-            if (dl == imodel.getHovered()) {
-                gc.setLineWidth(10);
-                gc.setStroke(Color.rgb(211, 211, 211, 0.6));
-                gc.strokeLine(dl.getX1(), dl.getY1(), dl.getX2(), dl.getY2());
+        for (Groupable element : model.getElements() ) {
+            if (element instanceof DLine line) {
+                drawline(line);
+            } else if (element instanceof DGroup group) {
+                drawGroup(group);
             }
-
-            // draw normal line
-            gc.setLineWidth(2);
-//            gc.setStroke(dl == imodel.getSelection() ? Color.PINK : Color.PURPLE);
-            gc.setStroke(imodel.getSelection().contains(dl) ? Color.PINK : Color.PURPLE);
-            gc.strokeLine(dl.getX1(), dl.getY1(), dl.getX2(), dl.getY2());
-
-            drawEndpoints(dl, dl.getX1(), dl.getY1(), dl.getX2(), dl.getY2());
         }
         drawRubberBand();
+    }
+
+    private void drawline(DLine dl) {
+        // draw hover line
+        if (dl == imodel.getHovered()) {
+            gc.setLineWidth(10);
+            gc.setStroke(Color.rgb(211, 211, 211, 0.6));
+            gc.strokeLine(dl.getX1(), dl.getY1(), dl.getX2(), dl.getY2());
+        }
+
+        // draw normal line
+        gc.setLineWidth(2);
+//            gc.setStroke(dl == imodel.getSelection() ? Color.PINK : Color.PURPLE);
+        gc.setStroke(imodel.getSelection().contains(dl) ? Color.PINK : Color.PURPLE);
+        gc.strokeLine(dl.getX1(), dl.getY1(), dl.getX2(), dl.getY2());
+
+        drawEndpoints(dl, dl.getX1(), dl.getY1(), dl.getX2(), dl.getY2());
+    }
+
+    private void drawGroup(DGroup group) {
+        group.makeBoundingBoxDimensions();
+        gc.setLineWidth(4);
+        gc.setStroke(Color.PINK);
+        gc.strokeRect(group.getMinX(), group.getMinY(), (group.getMaxX() - group.getMinX()), (group.getMaxY() - group.getMinY()));
+
+        List<Groupable> children = group.getChildren();
+        for (Groupable child : children) {
+            if (child instanceof DLine line) {
+                gc.setLineWidth(2);
+                gc.setStroke(Color.PURPLE);
+                gc.strokeLine(line.getX1(), line.getY1(), line.getX2(), line.getY2());
+            }
+        }
     }
 
     /**

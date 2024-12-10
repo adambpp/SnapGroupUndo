@@ -4,8 +4,8 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class iModel {
-    private ArrayList<DLine> selection;
-    private DLine hovered;
+    private ArrayList<Groupable> selection;
+    private Groupable hovered;
     private DLine Selected;
     private ArrayList<Subscriber> subs;
 
@@ -17,10 +17,10 @@ public class iModel {
     /**
      * Add a line to the selection ArrayList
      *
-     * @param line: A line object to be added to the selection list
+     * @param element: A line or group object to be added to the selection list
      */
-    public void addToSelection(DLine line) {
-        selection.add(line);
+    public void addToSelection(Groupable element) {
+        selection.add(element);
         notifySubscribers();
     }
 
@@ -34,7 +34,7 @@ public class iModel {
         notifySubscribers();
     }
 
-    public void setHovered(DLine line) {
+    public void setHovered(Groupable line) {
         hovered = line;
         notifySubscribers();
     }
@@ -49,11 +49,11 @@ public class iModel {
      *
      * @return: The selected line
      */
-    public List<DLine> getSelection() {
+    public List<Groupable> getSelection() {
         return selection;
     }
 
-    public DLine getHovered() {
+    public Groupable getHovered() {
         return hovered;
     }
 

@@ -82,9 +82,11 @@ public class DView extends StackPane implements Subscriber{
 
     private void drawGroup(DGroup group) {
         group.makeBoundingBoxDimensions();
-        gc.setLineWidth(4);
-        gc.setStroke(Color.PINK);
-        gc.strokeRect(group.getMinX(), group.getMinY(), (group.getMaxX() - group.getMinX()), (group.getMaxY() - group.getMinY()));
+        if (imodel.getSelection().contains(group)) {
+            gc.setLineWidth(4);
+            gc.setStroke(Color.PINK);
+            gc.strokeRect(group.getMinX(), group.getMinY(), (group.getMaxX() - group.getMinX()), (group.getMaxY() - group.getMinY()));
+        }
 
         List<Groupable> children = group.getChildren();
         for (Groupable child : children) {
@@ -92,6 +94,8 @@ public class DView extends StackPane implements Subscriber{
                 gc.setLineWidth(2);
                 gc.setStroke(Color.PURPLE);
                 gc.strokeLine(line.getX1(), line.getY1(), line.getX2(), line.getY2());
+            } else if (child instanceof DGroup g) {
+                drawGroup(g);
             }
         }
     }

@@ -29,24 +29,33 @@ public class LineModel {
         return line;
     }
 
-    public void group(List<Groupable> sel) {
+    public DGroup group(List<Groupable> sel) {
         DGroup linegroup = new DGroup(sel);
-        sel.forEach(e -> removeLine((DLine) e));
+        sel.forEach(this::removeElement);
 
         elements.add(linegroup);
         notifySubscribers();
+        return linegroup;
     }
 
-//    public void ungroup(DGroup linegroup) {
-//        List<Groupable> elements = linegroup.getChildren();
-//
-//        for(Groupable g : elements) {
-//            if(g instanceof DLine line) {}
-//        }
-//    }
+    // make the ungrouped lines be selected after in controller (maybe? look at video first)
+    public void ungroup(DGroup linegroup) {
+        List<Groupable> elements = linegroup.getChildren();
+        removeElement(linegroup);
 
-    public void removeLine(DLine line) {
-        elements.remove(line);
+        for(Groupable g : elements) {
+            if(g instanceof DLine line) {
+                addLine(line.getX1(), line.getY1(), line.getX2(), line.getY2());
+            }
+            else if (g instanceof DGroup group) {
+                ungroup(group);
+            }
+        }
+        notifySubscribers();
+    }
+
+    public void removeElement(Groupable element) {
+        elements.remove(element);
         notifySubscribers();
     }
 
@@ -70,8 +79,8 @@ public class LineModel {
         notifySubscribers();
     }
 
-    public void rotateLine(List<Groupable> lines, double rotation_amount) {
-        lines.forEach(line -> line.rotate(rotation_amount));
+    public void rotateElement(List<Groupable> elements, double rotation_amount) {
+        elements.forEach(e -> e.rotate(rotation_amount));
         notifySubscribers();
     }
 
@@ -108,14 +117,26 @@ public class LineModel {
         notifySubscribers();
     }
 
-    public List<DLine> rubberBandLineSelect() {
-        List<DLine> linesWithinBounds = new ArrayList<>();
+    public List<Groupable> rubberBandLineSelect() {
+        List<Groupable> linesWithinBounds = new ArrayList<>();
 
 
         for(Groupable element : elements) {
+
+            // check if a line object is within bounds
             if (element instanceof DLine line) {
                 if (rubberband.contains(line.getX1(), line.getY1()) || rubberband.contains(line.getX2(), line.getY2())) {
                     linesWithinBounds.add(line);
+                }
+            } else if (element instanceof DGroup group) {
+                // loop through groups children to see if any of its lines are within bounds
+                for (Groupable groupchild : group.getChildren()) {
+                    if (groupchild instanceof DLine line) {
+                        if (rubberband.contains(line.getX1(), line.getY1()) || rubberband.contains(line.getX2(), line.getY2())) {
+                            linesWithinBounds.add(element);
+                            break;
+                        }
+                    }
                 }
             }
         }

@@ -13,6 +13,8 @@ public interface Groupable {
 
     void rotate(double rotationAmount);
 
+    void rotate(double rotationAmount, double centerX, double centerY);
+
     void move(double nX, double nY);
 
     boolean contains(double x, double y, double threshold);

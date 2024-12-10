@@ -75,6 +75,16 @@ public class DGroup implements Groupable{
 
     @Override
     public void rotate(double rotationAmount) {
+        double centerX = (minX + maxX) / 2;
+        double centerY = (minY + maxY) / 2;
+        children.forEach(e ->  {
+            e.rotate(rotationAmount, centerX, centerY);
+            resetBoxDimensions();
+        });
+    }
+
+    @Override
+    public void rotate(double rotationAmount, double centerX, double centerY) {
 
     }
 

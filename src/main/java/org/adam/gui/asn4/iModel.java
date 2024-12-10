@@ -27,10 +27,10 @@ public class iModel {
     /**
      * Remove a line from the selection list
      *
-     * @param line: A line object to be removed
+     * @param element: A line or group object to be removed
      */
-    public void removeFromSelection(DLine line) {
-        selection.remove(line);
+    public void removeFromSelection(Groupable element) {
+        selection.remove(element);
         notifySubscribers();
     }
 

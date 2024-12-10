@@ -130,21 +130,36 @@ public class AppController {
                 System.out.println("delete or backspace was pressed, deleting line");
                 if (imodel.getSelection() != null) {
                     for (Groupable element: imodel.getSelection()) {
-                        if (element instanceof DLine line) {
-                            model.removeLine(line);
-                        }
+                            model.removeElement(element);
                     }
                 }
+            // CHECKING SHIFT FOR LINE CREATION
             } else if (e.isShiftDown()) {
                 System.out.println("shift key pressed, about to create new line");
                 currentState = creating;
 
-            } else if (e.isControlDown()) {
+            }
+            // CHECKING CONTROL FOR MULTIPLE SELECT
+            else if (e.isControlDown()) {
                 currentState = multipleSelect;
 
-            } else if (Objects.requireNonNull(e.getCode()) == KeyCode.G){
-                model.group(imodel.getSelection());
-            }else if (Objects.requireNonNull(e.getCode()) == KeyCode.UP) {
+
+            }
+            // CHECKING G/U FOR GROUPING
+            else if (Objects.requireNonNull(e.getCode()) == KeyCode.G){
+                DGroup newGroup = model.group(imodel.getSelection());
+                imodel.addToSelection(newGroup);
+            } else if (Objects.requireNonNull(e.getCode()) == KeyCode.U){
+                if (imodel.getSelection() != null) {
+                    for (Groupable element: imodel.getSelection()) {
+                        if (element instanceof DGroup group) {
+                            model.ungroup(group);
+                        }
+                    }
+                }
+            }
+            // CHECKING UP/DOWN FOR SCALING
+            else if (Objects.requireNonNull(e.getCode()) == KeyCode.UP) {
                 if (imodel.getSelection() != null) {
                     model.scaleLine(imodel.getSelection(), 0.05, 0);
                 }
@@ -152,13 +167,17 @@ public class AppController {
                 if (imodel.getSelection() != null) {
                     model.scaleLine(imodel.getSelection(), 0.05, 1);
                 }
-            } else if (Objects.requireNonNull(e.getCode()) == KeyCode.LEFT) {
+
+            }
+
+            // CHECKING LEFT/RIGHT FOR ROTATING
+            else if (Objects.requireNonNull(e.getCode()) == KeyCode.LEFT) {
                 if (imodel.getSelection() != null) {
-                    model.rotateLine(imodel.getSelection(), 25);
+                    model.rotateElement(imodel.getSelection(), 5);
                 }
             } else if (Objects.requireNonNull(e.getCode()) == KeyCode.RIGHT) {
                 if (imodel.getSelection() != null) {
-                    model.rotateLine(imodel.getSelection(), -25);
+                    model.rotateElement(imodel.getSelection(), -5);
                 }
             }
         }
@@ -178,26 +197,27 @@ public class AppController {
         @Override
         void handleMouseMoved(MouseEvent e) {
             if (model.contains(e.getX(), e.getY(), 5)) {
-                imodel.setHovered((DLine) model.whichEntity(e.getX(), e.getY(), 5));
+                imodel.setHovered(model.whichEntity(e.getX(), e.getY(), 5));
             } else {
                 imodel.clearHovered();
             }
         }
 
+        //TODO: Make this also select/unselect groups
         @Override
         void handlePressed(MouseEvent e) {
             model.initRubberband(e.getX(), e.getY());
             prevX = e.getX();
             prevY = e.getY();
             if (model.contains(e.getX(), e.getY(), 5)) {
-                DLine clickedLine = (DLine) model.whichEntity(e.getX(), e.getY(), 5);
+                Groupable clickedElement = model.whichEntity(e.getX(), e.getY(), 5);
 
                 // add line to selection if not already in selection
-                if (!imodel.getSelection().contains(clickedLine)) {
-                    imodel.addToSelection(clickedLine);
+                if (!imodel.getSelection().contains(clickedElement)) {
+                    imodel.addToSelection(clickedElement);
                 } else {
                     // remove line from selection if already in selection list
-                    imodel.removeFromSelection(clickedLine);
+                    imodel.removeFromSelection(clickedElement);
                 }
 
             }
@@ -213,8 +233,8 @@ public class AppController {
         @Override
         void handleKeyReleased(KeyEvent e) {
             // get list of lines within the rectangle
-            List<DLine> lines = model.rubberBandLineSelect();
-            for (DLine line: lines) {
+            List<Groupable> lines = model.rubberBandLineSelect();
+            for (Groupable line: lines) {
                 // remove line from selection if already in selection list
                 if (imodel.getSelection().contains(line)) {
                     imodel.removeFromSelection(line);
@@ -259,13 +279,14 @@ public class AppController {
             model.resizeRubberband(dX, dY);
         }
 
+        //TODO: Make this select groups as well
         @Override
         void handleReleased(MouseEvent e) {
             // get list of lines within the rectangle
-            List<DLine> lines = model.rubberBandLineSelect();
-            for (DLine line: lines) {
-                if (!imodel.getSelection().contains(line)) {
-                    imodel.addToSelection(line);
+            List<Groupable> lines = model.rubberBandLineSelect();
+            for (Groupable element: lines) {
+                if (!imodel.getSelection().contains(element)) {
+                    imodel.addToSelection(element);
                 }
             }
             model.clearRubberband();

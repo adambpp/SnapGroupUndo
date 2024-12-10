@@ -103,6 +103,16 @@ public class DLine implements Groupable {
     public void rotate(double rotationAmount) {
         double centerX = (x1 + x2) / 2;
         double centerY = (y1 + y2) / 2;
+        doRotation(rotationAmount, centerX, centerY);
+    }
+
+    @Override
+    public void rotate(double rotationAmount, double centerX, double centerY) {
+        // find centerX and centerY of the group and then pass that to the children
+        doRotation(rotationAmount, centerX, centerY);
+    }
+
+    private void doRotation(double rotationAmount, double centerX, double centerY) {
         double dx1 = x1 - centerX;
         double dy1 = y1 - centerY;
         double dx2 = x2 - centerX;

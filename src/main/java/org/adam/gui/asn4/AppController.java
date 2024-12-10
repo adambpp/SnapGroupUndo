@@ -146,9 +146,13 @@ public class AppController {
 
             }
             // CHECKING G/U FOR GROUPING
-            else if (Objects.requireNonNull(e.getCode()) == KeyCode.G){
-                DGroup newGroup = model.group(imodel.getSelection());
-                imodel.addToSelection(newGroup);
+            else if (Objects.requireNonNull(e.getCode()) == KeyCode.G) {
+                List<Groupable> selection = imodel.getSelection();
+                if (!selection.isEmpty()) {
+                    DGroup newGroup = model.group(selection);
+                    imodel.clearSelection();
+                    imodel.addToSelection(newGroup);
+                }
             } else if (Objects.requireNonNull(e.getCode()) == KeyCode.U){
                 if (imodel.getSelection() != null) {
                     for (Groupable element: imodel.getSelection()) {
@@ -203,7 +207,6 @@ public class AppController {
             }
         }
 
-        //TODO: Make this also select/unselect groups
         @Override
         void handlePressed(MouseEvent e) {
             model.initRubberband(e.getX(), e.getY());
@@ -279,7 +282,6 @@ public class AppController {
             model.resizeRubberband(dX, dY);
         }
 
-        //TODO: Make this select groups as well
         @Override
         void handleReleased(MouseEvent e) {
             // get list of lines within the rectangle

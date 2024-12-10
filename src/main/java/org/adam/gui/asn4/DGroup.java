@@ -32,6 +32,7 @@ public class DGroup implements Groupable{
     }
 
     public void makeBoundingBoxDimensions() {
+        resetBoxDimensions();
         for (Groupable child : children) {
             if (child instanceof DLine line) {
                 double lineXmin = Math.min(line.getX1(), line.getX2());
@@ -43,9 +44,16 @@ public class DGroup implements Groupable{
                 maxX = Math.max(lineXmax, maxX);
                 minY = Math.min(lineYmin, minY);
                 maxY = Math.max(lineYmax, maxY);
+            } else if (child instanceof DGroup group) {
+                group.makeBoundingBoxDimensions();
+                minX = Math.min(group.getMinX(), minX);
+                maxX = Math.max(group.getMaxX(), maxX);
+                minY = Math.min(group.getMinY(), minY);
+                maxY = Math.max(group.getMaxY(), maxY);
             }
         }
     }
+
 
     private void resetBoxDimensions() {
         minX = Double.MAX_VALUE;
@@ -77,21 +85,30 @@ public class DGroup implements Groupable{
     public void rotate(double rotationAmount) {
         double centerX = (minX + maxX) / 2;
         double centerY = (minY + maxY) / 2;
-        children.forEach(e ->  {
-            e.rotate(rotationAmount, centerX, centerY);
-            resetBoxDimensions();
-        });
+
+        for (Groupable child : children) {
+            if (child instanceof DLine line) {
+                line.rotate(rotationAmount, centerX, centerY);
+
+            } else if (child instanceof DGroup group) {
+                group.rotate(rotationAmount, centerX, centerY);
+            }
+        }
     }
 
     @Override
     public void rotate(double rotationAmount, double centerX, double centerY) {
-
+        for (Groupable child: children) {
+            if (child instanceof DLine line) {
+                line.rotate(rotationAmount, centerX, centerY);
+            }
+        }
     }
 
     @Override
     public void move(double nX, double nY) {
         children.forEach(child -> child.move(nX, nY));
-        resetBoxDimensions();
+        //resetBoxDimensions();
     }
 
     @Override
@@ -99,6 +116,9 @@ public class DGroup implements Groupable{
         for (Groupable child : children) {
             if (child instanceof DLine line) {
                 if (line.contains(x, y, threshold)) return true;
+            }
+            else if (child instanceof DGroup group) {
+                if (group.contains(x, y, threshold)) return true;
             }
         }
         return false;

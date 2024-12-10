@@ -48,7 +48,7 @@ public class LineModel {
                 addLine(line.getX1(), line.getY1(), line.getX2(), line.getY2());
             }
             else if (g instanceof DGroup group) {
-                ungroup(group);
+                group(group.getChildren());
             }
         }
         notifySubscribers();

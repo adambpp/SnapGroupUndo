@@ -119,11 +119,11 @@ public class DLine implements Groupable {
         double dy2 = y2 - centerY;
         double angle = Math.toRadians(rotationAmount);
 
-        x1 = (dx1 * Math.cos(angle) + dy1 * Math.sin(angle)) + centerX;
-        x2 = (dx2 * Math.cos(angle) + dy2 * Math.sin(angle)) + centerX;
+        x1 = (dx1 * Math.cos(angle) - dy1 * Math.sin(angle)) + centerX;
+        y1 = (dx1 * Math.sin(angle) + dy1 * Math.cos(angle)) + centerY;
 
-        y1 = (-dx1 * Math.sin(angle) + dy1 * Math.cos(angle)) + centerY;
-        y2 = (-dx2 * Math.sin(angle) + dy2 * Math.cos(angle)) + centerY;
+        x2 = (dx2 * Math.cos(angle) - dy2 * Math.sin(angle)) + centerX;
+        y2 = (dx2 * Math.sin(angle) + dy2 * Math.cos(angle)) + centerY;
     }
 
     /*

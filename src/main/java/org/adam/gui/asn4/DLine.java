@@ -82,39 +82,16 @@ public class DLine implements Groupable {
 
     @Override
     public void scale(double scaleFactor, Integer upOrDown) {
-        double centerX = (x1 + x2) / 2;
-        double centerY = (y1 + y2) / 2;
-        double lineScaleLengthX;
-        double lineScaleLengthY;
+        double centerX = (x1 + x2) / 2.0;
+        double centerY = (y1 + y2) / 2.0;
 
-        if (upOrDown == 0) { // UP
-            lineScaleLengthX = (Math.max(x1, x2 - centerX)) * scaleFactor;
-            lineScaleLengthY = (Math.max(y1, y2 - centerY)) * scaleFactor;
-        } else { // DOWN
-            lineScaleLengthX = (Math.min(x2, x1 - centerX)) * scaleFactor;
-            lineScaleLengthY = (Math.min(y2, y1 - centerY)) * scaleFactor;
-        }
-
-        if (x1 < x2) {
-            adjustEndpoint(Endpoints.ENDPOINT_1, x1 - lineScaleLengthX, y1);
-            adjustEndpoint(Endpoints.ENDPOINT_2, x2 + lineScaleLengthX, y2);
-        } else if (x2 < x1) {
-            adjustEndpoint(Endpoints.ENDPOINT_1, x1 + lineScaleLengthX, y1);
-            adjustEndpoint(Endpoints.ENDPOINT_2, x2 - lineScaleLengthX, y2);
-        }
-        if (y1 < y2) {
-            adjustEndpoint(Endpoints.ENDPOINT_1, x1, y1 - lineScaleLengthY);
-            adjustEndpoint(Endpoints.ENDPOINT_2, x2, y2 + lineScaleLengthY);
-        }
-        else if (y2 < y1) {
-            adjustEndpoint(Endpoints.ENDPOINT_1, x1, y1 + lineScaleLengthY);
-            adjustEndpoint(Endpoints.ENDPOINT_2, x2, y2 - lineScaleLengthY);
-        }
+        doScale(scaleFactor, centerX, centerY, upOrDown);
     }
 
-    // this method does not get used in this class
     @Override
-    public void scale(double scaleFactor, double centerX, double centerY, Integer upOrDown) {}
+    public void scale(double scaleFactor, double centerX, double centerY, Integer upOrDown) {
+        doScale(scaleFactor, centerX, centerY, upOrDown);
+    }
 
     @Override
     public void rotate(double rotationAmount) {
@@ -127,6 +104,37 @@ public class DLine implements Groupable {
     public void rotate(double rotationAmount, double centerX, double centerY) {
         // find centerX and centerY of the group and then pass that to the children
         doRotation(rotationAmount, centerX, centerY);
+    }
+
+    private void doScale(double scaleFactor, double centerX, double centerY, Integer upOrDown) {
+        // Vectors from center to endpoints
+        double dx1 = x1 - centerX;
+        double dy1 = y1 - centerY;
+        double dx2 = x2 - centerX;
+        double dy2 = y2 - centerY;
+
+
+        double actualFactor = scaleFactor;
+        if (upOrDown != 0) {
+            // this means down, so we do:
+            actualFactor = 1.0 / scaleFactor;
+        }
+
+        // scale the vectors
+        dx1 *= actualFactor;
+        dy1 *= actualFactor;
+        dx2 *= actualFactor;
+        dy2 *= actualFactor;
+
+        // compute new endpoints
+        double newX1 = centerX + dx1;
+        double newY1 = centerY + dy1;
+        double newX2 = centerX + dx2;
+        double newY2 = centerY + dy2;
+
+        // update endpoints
+        adjustEndpoint(Endpoints.ENDPOINT_1, newX1, newY1);
+        adjustEndpoint(Endpoints.ENDPOINT_2, newX2, newY2);
     }
 
     private void doRotation(double rotationAmount, double centerX, double centerY) {

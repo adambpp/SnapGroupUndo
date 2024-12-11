@@ -74,11 +74,27 @@ public class DGroup implements Groupable{
 
     // this method does not get used in this class
     @Override
-    public void scale(double scaleFactor, Integer upOrDown) {}
+    public void scale(double scaleFactor, Integer upOrDown) {
+        double centerX = (minX + maxX) / 2;
+        double centerY = (minY + maxY) / 2;
+
+        for (Groupable child : children) {
+            if (child instanceof DLine line) {
+                line.scale(scaleFactor, centerX, centerY, upOrDown);
+
+            } else if (child instanceof DGroup group) {
+                group.scale(scaleFactor, centerX, centerY, upOrDown);
+            }
+        }
+    }
 
     @Override
     public void scale(double scaleFactor, double centerX, double centerY, Integer upOrDown) {
-
+        for (Groupable child: children) {
+            if (child instanceof DLine line) {
+                line.scale(scaleFactor, centerX, centerY, upOrDown);
+            }
+        }
     }
 
     @Override

@@ -12,6 +12,8 @@ public class AppController {
     private iModel imodel;
     private ControllerState currentState;
     private double prevX, prevY, dX, dY;
+    private double rotationTotal = 0;
+
 
     public AppController() {
         currentState = ready;
@@ -137,12 +139,13 @@ public class AppController {
         void handleKeyPressed(KeyEvent e) {
             if (Objects.requireNonNull(e.getCode()) == KeyCode.DELETE || e.getCode() == KeyCode.BACK_SPACE) {
                 System.out.println("delete or backspace was pressed, deleting line");
-                if (imodel.getSelection() != null) {
+                if (!imodel.getSelection().isEmpty()) {
+                    DeleteCommand cmd = new DeleteCommand(model, imodel.getSelection());
+                    imodel.clearRedoStack();
+                    imodel.addToUndoStack(cmd);
+
                     for (Groupable element: imodel.getSelection()) {
                         model.removeElement(element);
-                        DeleteCommand cmd = new DeleteCommand(model, element);
-                        imodel.clearRedoStack();
-                        imodel.addToUndoStack(cmd);
                     }
                 }
             // CHECKING SHIFT FOR LINE CREATION
@@ -164,11 +167,17 @@ public class AppController {
                     DGroup newGroup = model.group(selection);
                     imodel.clearSelection();
                     imodel.addToSelection(newGroup);
+                    GroupCommand cmd = new GroupCommand(model, newGroup);
+                    imodel.clearRedoStack();
+                    imodel.addToUndoStack(cmd);
                 }
             } else if (Objects.requireNonNull(e.getCode()) == KeyCode.U){
                 if (imodel.getSelection() != null) {
                     for (Groupable element: imodel.getSelection()) {
                         if (element instanceof DGroup group) {
+//                            UngroupCommand cmd = new UngroupCommand(model, group);
+//                            imodel.clearRedoStack();
+//                            imodel.addToUndoStack(cmd);
                             model.ungroup(group);
                         }
                     }
@@ -177,11 +186,11 @@ public class AppController {
             // CHECKING UP/DOWN FOR SCALING
             else if (Objects.requireNonNull(e.getCode()) == KeyCode.UP) {
                 if (imodel.getSelection() != null) {
-                    model.scaleLine(imodel.getSelection(), 0.05, 0);
+                    model.scaleLine(imodel.getSelection(), 1.25, 0);
                 }
             }else if (Objects.requireNonNull(e.getCode()) == KeyCode.DOWN) {
                 if (imodel.getSelection() != null) {
-                    model.scaleLine(imodel.getSelection(), 0.05, 1);
+                    model.scaleLine(imodel.getSelection(), 1.25, 1);
                 }
 
             }
@@ -189,16 +198,40 @@ public class AppController {
             // CHECKING LEFT/RIGHT FOR ROTATING
             else if (Objects.requireNonNull(e.getCode()) == KeyCode.LEFT) {
                 if (imodel.getSelection() != null) {
-                    model.rotateElement(imodel.getSelection(), 5);
+                    model.rotateElement(imodel.getSelection(), -5);
+                    rotationTotal -= 5;
                 }
             } else if (Objects.requireNonNull(e.getCode()) == KeyCode.RIGHT) {
                 if (imodel.getSelection() != null) {
-                    model.rotateElement(imodel.getSelection(), -5);
+                    model.rotateElement(imodel.getSelection(), 5);
+                    rotationTotal += 5;
                 }
             } else if (Objects.requireNonNull(e.getCode()) == KeyCode.Z) {
                 imodel.handleUndo();
             } else if (Objects.requireNonNull(e.getCode()) == KeyCode.R) {
                 imodel.handleRedo();
+            }
+        }
+
+        @Override
+        void handleKeyReleased(KeyEvent e) {
+            // CHECKING LEFT/RIGHT FOR ROTATING
+            if (Objects.requireNonNull(e.getCode()) == KeyCode.LEFT) {
+                if (imodel.getSelection() != null) {
+                    System.out.println("yuh");
+                    RotateCommand cmd = new RotateCommand(model, imodel.getSelection(), rotationTotal);
+                    imodel.clearRedoStack();
+                    imodel.addToUndoStack(cmd);
+                    rotationTotal = 0;
+
+                }
+            } else if (Objects.requireNonNull(e.getCode()) == KeyCode.RIGHT) {
+                if (imodel.getSelection() != null) {
+                    RotateCommand cmd = new RotateCommand(model, imodel.getSelection(), rotationTotal);
+                    imodel.clearRedoStack();
+                    imodel.addToUndoStack(cmd);
+                    rotationTotal = 0;
+                }
             }
         }
 

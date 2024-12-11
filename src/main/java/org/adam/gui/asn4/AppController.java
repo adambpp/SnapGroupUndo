@@ -104,10 +104,16 @@ public class AppController {
                     if (isWithinEndpoint(e.getX(), e.getY(), line.getX1(), line.getY1(), 5)) {
                         System.out.println("Current endpoint set to endpoint 1");
                         line.setCurEndpoint(0);
+                        AdjustCommand cmd = new AdjustCommand(model, line, line.getX1(), line.getY1(), line.getX2(), line.getY2());
+                        imodel.clearRedoStack();
+                        imodel.addToUndoStack(cmd);
                         currentState = endpointAdjusting;
                     } else if (isWithinEndpoint(e.getX(), e.getY(), line.getX2(), line.getY2(), 5)) {
                         System.out.println("Current endpoint set to endpoint 2");
                         line.setCurEndpoint(1);
+                        AdjustCommand cmd = new AdjustCommand(model, line, line.getX1(), line.getY1(), line.getX2(), line.getY2());
+                        imodel.clearRedoStack();
+                        imodel.addToUndoStack(cmd);
                         currentState = endpointAdjusting;
 
                     }                    }

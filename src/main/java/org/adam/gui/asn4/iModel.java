@@ -27,9 +27,9 @@ public class iModel {
     }
 
     public void handleUndo() {
-        System.out.println("type shi");
         System.out.println(undoStack.size());
         if (!undoStack.isEmpty()) {
+            System.out.println("undoing " + undoStack.peek().toString());
             DCommand cmd = undoStack.pop();
             cmd.undo();
             redoStack.push(cmd);

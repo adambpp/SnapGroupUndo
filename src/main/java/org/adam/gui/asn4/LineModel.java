@@ -70,6 +70,11 @@ public class LineModel {
         notifySubscribers();
     }
 
+    public void adjustAll(DLine line, double x1, double y1, double x2, double y2) {
+        line.adjustAll(x1, y1, x2, y2);
+        notifySubscribers();
+    }
+
     public void adjustEndpoint(DLine line, double nX, double nY) {
         line.adjustEndpoint(line.getCurEndpoint(), nX, nY);
         notifySubscribers();

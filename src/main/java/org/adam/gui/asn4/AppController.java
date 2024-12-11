@@ -130,7 +130,12 @@ public class AppController {
                 System.out.println("delete or backspace was pressed, deleting line");
                 if (imodel.getSelection() != null) {
                     for (Groupable element: imodel.getSelection()) {
-                            model.removeElement(element);
+                        model.removeElement(element);
+                        if (element instanceof DLine line) {
+                            DeleteCommand cmd = new DeleteCommand(model, line);
+                            imodel.clearRedoStack();
+                            imodel.addToUndoStack(cmd);
+                        }
                     }
                 }
             // CHECKING SHIFT FOR LINE CREATION

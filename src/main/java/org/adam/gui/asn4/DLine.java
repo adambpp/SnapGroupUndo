@@ -42,6 +42,11 @@ public class DLine implements Groupable {
         this.y2 = y2;
     }
 
+    public void adjustFromCopy(DLine lineToModify, DLine l) {
+        lineToModify.adjustAll(l.getX1(), l.getY1(), l.getX2(), l.getY2());
+
+    }
+
     public void adjustEndpoint(Endpoints endpoint, double nX, double nY) {
         if (endpoint == Endpoints.ENDPOINT_1) {
             this.x1 = nX;
@@ -50,6 +55,11 @@ public class DLine implements Groupable {
             this.x2 = nX;
             this.y2 = nY;
         }
+    }
+
+    @Override
+    public DLine deepcopy() {
+        return new DLine(x1, y1, x2, y2);
     }
 
     @Override

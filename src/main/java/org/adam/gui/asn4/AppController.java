@@ -120,6 +120,9 @@ public class AppController {
                 }
                 // move the line if we were not on an endpoint
                 if (model.findLineWithCurEndpoint(imodel.getSelection()) == null) {
+                    MoveCommand cmd = new MoveCommand(model, imodel.getSelection());
+                    imodel.clearRedoStack();
+                    imodel.addToUndoStack(cmd);
                     currentState = moving;
                 }
                 // clear selection otherwise

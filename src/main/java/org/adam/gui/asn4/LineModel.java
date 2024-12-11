@@ -70,8 +70,20 @@ public class LineModel {
         notifySubscribers();
     }
 
-    public void adjustAll(DLine line, double x1, double y1, double x2, double y2) {
-        line.adjustAll(x1, y1, x2, y2);
+    public void adjustAll(Groupable element, double x1, double y1, double x2, double y2) {
+
+        if (element instanceof DLine line) {
+            line.adjustAll(x1, y1, x2, y2);
+        }
+        notifySubscribers();
+    }
+
+    public void adjustFromCopy(Groupable elementToModify, Groupable e) {
+        if (elementToModify instanceof DLine line) {
+            line.adjustFromCopy((DLine) elementToModify, (DLine) e);
+        } else if (elementToModify instanceof DGroup group) {
+            group.adjustFromCopy((DGroup) elementToModify, (DGroup) e);
+        }
         notifySubscribers();
     }
 

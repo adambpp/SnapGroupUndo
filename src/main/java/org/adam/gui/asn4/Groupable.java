@@ -19,4 +19,6 @@ public interface Groupable {
 
     boolean contains(double x, double y, double threshold);
 
+    Groupable deepcopy();
+
 }

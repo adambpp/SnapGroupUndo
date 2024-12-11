@@ -111,6 +111,48 @@ public class DGroup implements Groupable{
         //resetBoxDimensions();
     }
 
+    public void adjustAll(double x1, double y1, double x2, double y2) {
+        for (Groupable child: children) {
+            if (child instanceof DLine line) {
+                line.adjustAll(x1, y1, x2, y2);
+            } else if (child instanceof DGroup group) {
+                group.adjustAll(x1,y1, x2, y2);
+            }
+        }
+    }
+
+    public void adjustFromCopy(DGroup groupToModify, DGroup g) {
+        List<Groupable> childrenToModify = groupToModify.getChildren();
+        List<Groupable> copy = g.getChildren();
+
+        for (int i = 0; i < childrenToModify.size(); i++) {
+            Groupable childToModify = childrenToModify.get(i);
+            Groupable copyChild = copy.get(i);
+
+            if (childToModify instanceof DLine lineToModify && copyChild instanceof DLine lineCopy) {
+                // adjust the line using the coordinates from the corresponding line in the copy
+                lineToModify.adjustAll(lineCopy.getX1(), lineCopy.getY1(), lineCopy.getX2(), lineCopy.getY2());
+            } else if (childToModify instanceof DGroup groupToModifyChild && copyChild instanceof DGroup groupCopyChild) {
+                // recursively adjust nested groups
+                adjustFromCopy(groupToModifyChild, groupCopyChild);
+            }
+        }
+    }
+
+
+    @Override
+    public DGroup deepcopy() {
+        List<Groupable> childrenCopy = new ArrayList<>();
+        for (Groupable child: children) {
+            if (child instanceof DLine line) {
+                childrenCopy.add(line.deepcopy());
+            } else if (child instanceof DGroup group) {
+                childrenCopy.add(group.deepcopy());
+            }
+        }
+        return new DGroup(childrenCopy);
+    }
+
     @Override
     public boolean contains(double x, double y, double threshold) {
         for (Groupable child : children) {

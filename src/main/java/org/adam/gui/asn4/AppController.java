@@ -176,10 +176,10 @@ public class AppController {
                 if (imodel.getSelection() != null) {
                     for (Groupable element: imodel.getSelection()) {
                         if (element instanceof DGroup group) {
-//                            UngroupCommand cmd = new UngroupCommand(model, group);
-//                            imodel.clearRedoStack();
-//                            imodel.addToUndoStack(cmd);
-                            model.ungroup(group);
+                            UngroupCommand cmd = new UngroupCommand(model, model.ungroup(group));
+                            imodel.clearRedoStack();
+                            imodel.addToUndoStack(cmd);
+//                            model.ungroup(group);
                         }
                     }
                 }

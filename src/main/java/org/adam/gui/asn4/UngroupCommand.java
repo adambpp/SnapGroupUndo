@@ -4,13 +4,12 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class UngroupCommand implements DCommand{
+    private List<Groupable> stuff;
     private DGroup group;
-    private List<Groupable> groupchildren = new ArrayList<>();
     private LineModel linemodel;
 
-    public UngroupCommand(LineModel lm, DGroup g) {
-        this.group = g;
-        groupchildren.addAll(g.getChildren());
+    public UngroupCommand(LineModel lm, List<Groupable> lines) {
+        this.stuff = lines;
         this.linemodel = lm;
     }
 
@@ -21,6 +20,7 @@ public class UngroupCommand implements DCommand{
 
     @Override
     public void undo() {
-        linemodel.group(groupchildren);
+        stuff.forEach(e -> linemodel.removeElement(e));
+        group = linemodel.group(stuff);
     }
 }

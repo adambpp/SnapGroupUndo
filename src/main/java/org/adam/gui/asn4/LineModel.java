@@ -45,19 +45,21 @@ public class LineModel {
     }
 
     // make the ungrouped lines be selected after in controller (maybe? look at video first)
-    public void ungroup(DGroup linegroup) {
+    public List<Groupable> ungroup(DGroup linegroup) {
         List<Groupable> elements = linegroup.getChildren();
+        List<Groupable> newLines = new ArrayList<>();
         removeElement(linegroup);
 
         for(Groupable g : elements) {
             if(g instanceof DLine line) {
-                addLine(line.getX1(), line.getY1(), line.getX2(), line.getY2());
+                newLines.add(addLine(line.getX1(), line.getY1(), line.getX2(), line.getY2()));
             }
             else if (g instanceof DGroup group) {
                 group(group.getChildren());
             }
         }
         notifySubscribers();
+        return newLines;
     }
 
     public void removeElement(Groupable element) {

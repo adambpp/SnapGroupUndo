@@ -13,6 +13,7 @@ public class AppController {
     private ControllerState currentState;
     private double prevX, prevY, dX, dY;
     private double rotationTotal = 0;
+    private double scaleTotal = 0;
 
 
     public AppController() {
@@ -187,12 +188,13 @@ public class AppController {
             else if (Objects.requireNonNull(e.getCode()) == KeyCode.UP) {
                 if (imodel.getSelection() != null) {
                     model.scaleLine(imodel.getSelection(), 1.25, 0);
+                    scaleTotal += 1.25;
                 }
             }else if (Objects.requireNonNull(e.getCode()) == KeyCode.DOWN) {
                 if (imodel.getSelection() != null) {
-                    model.scaleLine(imodel.getSelection(), 1.25, 1);
+                    model.scaleLine(imodel.getSelection(), 1/1.25, 1);
+                    scaleTotal += 1.25;
                 }
-
             }
 
             // CHECKING LEFT/RIGHT FOR ROTATING
@@ -232,6 +234,22 @@ public class AppController {
                     imodel.addToUndoStack(cmd);
                     rotationTotal = 0;
                 }
+            }
+            else if (Objects.requireNonNull(e.getCode()) == KeyCode.UP) {
+                if (imodel.getSelection() != null) {
+                    ScaleCommand cmd = new ScaleCommand(model, imodel.getSelection(), scaleTotal, 0);
+                    imodel.clearRedoStack();
+                    imodel.addToUndoStack(cmd);
+                    scaleTotal = 0;
+                }
+            }else if (Objects.requireNonNull(e.getCode()) == KeyCode.DOWN) {
+                if (imodel.getSelection() != null) {
+                    ScaleCommand cmd = new ScaleCommand(model, imodel.getSelection(), scaleTotal, 1);
+                    imodel.clearRedoStack();
+                    imodel.addToUndoStack(cmd);
+                    scaleTotal = 0;
+                }
+
             }
         }
 

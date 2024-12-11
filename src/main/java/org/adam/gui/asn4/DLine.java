@@ -114,17 +114,17 @@ public class DLine implements Groupable {
         double dy2 = y2 - centerY;
 
 
-        double actualFactor = scaleFactor;
-        if (upOrDown != 0) {
-            // this means down, so we do:
-            actualFactor = 1.0 / scaleFactor;
-        }
+//        double actualFactor = scaleFactor;
+//        if (upOrDown != 0) {
+//            // this means down, so we do:
+//            actualFactor = 1.0 / scaleFactor;
+//        }
 
         // scale the vectors
-        dx1 *= actualFactor;
-        dy1 *= actualFactor;
-        dx2 *= actualFactor;
-        dy2 *= actualFactor;
+        dx1 *= scaleFactor;
+        dy1 *= scaleFactor;
+        dx2 *= scaleFactor;
+        dy2 *= scaleFactor;
 
         // compute new endpoints
         double newX1 = centerX + dx1;

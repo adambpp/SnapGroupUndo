@@ -12,7 +12,7 @@ public class CreateCommand implements DCommand {
 
     @Override
     public void doit() {
-        linemodel.addLine(line);
+        linemodel.addElement(line);
     }
 
     @Override

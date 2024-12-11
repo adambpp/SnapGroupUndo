@@ -131,11 +131,9 @@ public class AppController {
                 if (imodel.getSelection() != null) {
                     for (Groupable element: imodel.getSelection()) {
                         model.removeElement(element);
-                        if (element instanceof DLine line) {
-                            DeleteCommand cmd = new DeleteCommand(model, line);
-                            imodel.clearRedoStack();
-                            imodel.addToUndoStack(cmd);
-                        }
+                        DeleteCommand cmd = new DeleteCommand(model, element);
+                        imodel.clearRedoStack();
+                        imodel.addToUndoStack(cmd);
                     }
                 }
             // CHECKING SHIFT FOR LINE CREATION

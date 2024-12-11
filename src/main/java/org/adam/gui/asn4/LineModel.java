@@ -30,10 +30,9 @@ public class LineModel {
         return line;
     }
 
-    public DLine addLine(DLine line) {
-        elements.add(line);
+    public void addElement(Groupable e) {
+        elements.add(e);
         notifySubscribers();
-        return line;
     }
 
     public DGroup group(List<Groupable> sel) {

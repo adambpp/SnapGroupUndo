@@ -1,21 +1,21 @@
 package org.adam.gui.asn4;
 
 public class DeleteCommand implements DCommand{
-    DLine line;
+    Groupable element;
     LineModel linemodel;
 
-    public DeleteCommand(LineModel lm, DLine dl) {
-        line = dl;
+    public DeleteCommand(LineModel lm, Groupable g) {
+        element = g;
         linemodel = lm;
     }
 
     @Override
     public void doit() {
-        linemodel.removeElement(line);
+        linemodel.removeElement(element);
     }
 
     @Override
     public void undo() {
-        linemodel.addLine(line);
+        linemodel.addElement(element);
     }
 }

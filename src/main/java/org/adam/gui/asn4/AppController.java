@@ -338,8 +338,6 @@ public class AppController {
         }
     };
 
-    // THIS STATE SHOULD ONLY SELECT WHAT IS IN THE RUBBER BAND BOX
-    // AND THEN CTRL CLICK DRAG WILL BOTH SELECT AND UNSELECT, SO I NEED TO MAKE ANOTHER STATE
     ControllerState rubberBandSelectOnly = new ControllerState() {
 
         @Override

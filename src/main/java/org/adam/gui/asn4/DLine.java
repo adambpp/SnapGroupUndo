@@ -26,7 +26,6 @@ public class DLine implements Groupable {
         double ratioB = (x2 - x1) / length;
         double ratioC = -1 * ((y1 - y2) * x1 + (x2 - x1) * y1) / length;
         double distFromLine = Math.abs((ratioA * x) + (ratioB * y) + ratioC); // Ax + By + C
-//        System.out.println("distFromLine: " + distFromLine);
         return distFromLine <= threshold || distFromLine == 0;
     }
 
